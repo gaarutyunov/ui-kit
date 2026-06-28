@@ -1,0 +1,45 @@
+name: Deploy Storybook
+
+# Build the Storybook on every push to main and publish it to the root of the
+# `gh-pages` branch. PR previews live in `pr-preview/` on the same branch, so we
+# keep_files to avoid wiping them.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pages-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build Storybook
+        run: npm run build-storybook
+        env:
+          STORYBOOK_BASE: /ui-kit/
+
+      - name: Publish to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./storybook-static
+          keep_files: true # preserve pr-preview/* directories
+          user_name: github-actions[bot]
+          user_email: github-actions[bot]@users.noreply.github.com
+          commit_message: "deploy: Storybook from ${{ github.sha }}"
