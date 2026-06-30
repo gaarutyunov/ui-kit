@@ -1,9 +1,12 @@
-name: Storybook PR Preview
+name: Docs PR Preview
 
-# Build a Storybook for each pull request and deploy it to
+# Build the docs site for each pull request and deploy it to
 # https://gaarutyunov.github.io/ui-kit/pr-preview/pr-<N>/
 # A sticky comment with the link is posted on the PR. The preview is removed
 # automatically when the PR is closed.
+#
+# The site uses relative imports + hash routing, so it runs correctly under
+# the preview subpath with no base-path configuration.
 
 on:
   pull_request:
@@ -25,25 +28,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Build site
         if: github.event.action != 'closed'
-        with:
-          node-version: 20
-          cache: npm
-
-      - run: npm ci
-        if: github.event.action != 'closed'
-
-      - name: Build Storybook
-        if: github.event.action != 'closed'
-        run: npm run build-storybook
-        env:
-          STORYBOOK_BASE: /ui-kit/pr-preview/pr-${{ github.event.number }}/
+        run: node scripts/build.mjs
 
       - name: Deploy preview
         uses: rossjrw/pr-preview-action@v1
         with:
-          source-dir: ./storybook-static
+          source-dir: ./dist
           preview-branch: gh-pages
           umbrella-dir: pr-preview
           action: auto # deploy on open/sync, remove on close

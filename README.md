@@ -10,12 +10,12 @@ pure-black design system:
 - [**garutyunov.com**](https://github.com/gaarutyunov/garutyunov.com) — a Next.js portfolio
 - [**stereoscope**](https://github.com/gaarutyunov/stereoscope) — a buildless WebGPU image converter
 
-📖 **[Live Storybook →](https://gaarutyunov.github.io/ui-kit/)** (best on desktop)
-&nbsp;·&nbsp; 📱 **[Standalone showcase →](https://gaarutyunov.github.io/ui-kit/demo/test.html)** (works everywhere, incl. mobile Safari)
+📖 **[Live docs & playground →](https://gaarutyunov.github.io/ui-kit/)**
 
-> Storybook is a desktop-oriented dev tool and its preview UI can render
-> unreliably on mobile browsers. The standalone showcase loads the components
-> as plain ES modules with no Storybook, so it renders in any browser.
+> The documentation site is **built from the kit's own components** — a
+> buildless, framework-free SPA (hash routing + ES modules) with an
+> interactive playground, API tables and a dark/light toggle. No Storybook, no
+> bundler, so it renders in **any browser, including mobile Safari**.
 
 ---
 
@@ -125,24 +125,40 @@ See [`src/tokens/tokens.css`](src/tokens/tokens.css) for the full token set
 
 ## Develop
 
+The kit and its docs site are **zero-dependency** — there's nothing to
+`npm install`. You only need Node to run the tiny static dev server (ES
+modules must be served over `http://`, not `file://`):
+
 ```bash
-npm install
-npm run storybook       # dev server at http://localhost:6006
-npm run build-storybook # static build → storybook-static/
+npm run dev     # docs site at http://localhost:8000
+npm run build   # assemble the static site → dist/
 ```
 
-Each component lives in `src/components/<name>/` with its `.js` implementation
-and a `.stories.js` next to it.
+Layout:
+
+- `src/` — the kit. Each component lives in `src/components/<name>/<name>.js`;
+  `src/core/base-element.js` is the ~3 KB base class; `src/tokens/tokens.css`
+  holds the design tokens.
+- `site/` — the docs site (`app.js` router/renderer, `app.css`, `registry.js`
+  content), built from the `ga-*` components themselves.
+- `scripts/` — `build.mjs` (copies `index.html` + `site/` + `src/` into
+  `dist/`) and `serve.mjs` (dev server).
+
+To document a new component, add it to `site/registry.js` — no code changes
+needed elsewhere.
 
 ## Deployment
 
-Two GitHub Actions workflows publish the Storybook to GitHub Pages:
+Two GitHub Actions workflows publish the docs site to GitHub Pages. Because the
+site is buildless static files, **CI installs nothing** — it just runs the copy
+script and publishes `dist/`:
 
-- **`deploy-storybook.yml`** — on every push to `main`, builds and publishes to
-  the root of the `gh-pages` branch → <https://gaarutyunov.github.io/ui-kit/>.
-- **`pr-preview.yml`** — on every pull request, builds and deploys an isolated
-  preview to `…/pr-preview/pr-<N>/` and posts a sticky comment with the link.
-  The preview is removed automatically when the PR is closed.
+- **`deploy.yml`** — on every push to `main`, assembles the site and publishes
+  it to the root of the `gh-pages` branch → <https://gaarutyunov.github.io/ui-kit/>.
+- **`pr-preview.yml`** — on every pull request, deploys an isolated preview to
+  `…/pr-preview/pr-<N>/` and posts a sticky comment with the link. The preview
+  is removed automatically when the PR is closed. (Relative imports + hash
+  routing mean no base-path configuration is needed.)
 
 **One-time setup:** in the repo's **Settings → Pages**, set the source to
 **Deploy from a branch** and choose the **`gh-pages`** branch (`/ root`). The

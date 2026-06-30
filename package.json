@@ -1,7 +1,7 @@
 {
   "name": "@gaarutyunov/ui-kit",
   "version": "0.1.0",
-  "description": "A universal, zero-dependency Web Components UI kit. Works in vanilla JS, React, Astro, Vue, Svelte — any frontend. Geist-inspired pure-black dark theme.",
+  "description": "A universal, zero-dependency Web Components UI kit. Works in vanilla JS, React, Astro, Vue, Svelte — any frontend. Geist-inspired pure-black theme, with a buildless docs site built from the components themselves.",
   "type": "module",
   "license": "MIT",
   "author": "German Arutyunov <germanarutyunov@gmail.com>",
@@ -18,8 +18,8 @@
     "vanilla-js",
     "react",
     "astro",
-    "storybook",
-    "framework-agnostic"
+    "framework-agnostic",
+    "buildless"
   ],
   "main": "src/index.js",
   "module": "src/index.js",
@@ -37,22 +37,7 @@
     "*.css"
   ],
   "scripts": {
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build -o storybook-static"
-  },
-  "devDependencies": {
-    "@storybook/addon-a11y": "8.6.18",
-    "@storybook/addon-docs": "8.6.18",
-    "@storybook/addon-essentials": "8.6.18",
-    "@storybook/blocks": "8.6.18",
-    "@storybook/web-components-vite": "8.6.18",
-    "storybook": "8.6.18",
-    "vite": "^5.4.11"
-  },
-  "overrides": {
-    "storybook": "8.6.18",
-    "@storybook/core": "8.6.18",
-    "@storybook/addon-docs": "8.6.18",
-    "@storybook/blocks": "8.6.18"
+    "dev": "node scripts/serve.mjs",
+    "build": "node scripts/build.mjs"
   }
 }
