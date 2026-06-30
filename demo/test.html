@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GA UI Kit — standalone demo</title>
+  <link rel="icon" href="data:," /><!-- suppress favicon 404 -->
+  <!-- Theme tokens. Relative path so it works under any deploy base. -->
+  <link rel="stylesheet" href="../src/tokens/tokens.css" />
+  <style>
+    body { margin: 0; padding: 24px; max-width: 720px; }
+    h1 { font-size: 22px; margin: 0 0 4px; }
+    p.sub { color: var(--ga-muted, #888); margin: 0 0 24px; font-size: 14px; }
+    section { margin: 0 0 28px; }
+    h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em;
+         color: var(--ga-muted, #888); margin: 0 0 12px; font-weight: 600; }
+    .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    /* On-screen diagnostics so errors are visible on mobile without dev tools. */
+    #diag { position: fixed; left: 0; right: 0; bottom: 0; max-height: 45vh; overflow: auto;
+            background: #2a0000; color: #ffb3b3; font: 12px/1.5 ui-monospace, monospace;
+            padding: 12px 16px; border-top: 2px solid #ff6568; display: none; white-space: pre-wrap; }
+    #status { display: inline-block; padding: 4px 10px; border-radius: 9999px; font-size: 12px;
+              font-family: ui-monospace, monospace; }
+  </style>
+</head>
+<body class="ga-theme">
+  <h1>GA UI Kit — standalone demo</h1>
+  <p class="sub">
+    No Storybook here — just the raw Web Components loaded as ES modules, the way
+    you'd use them in a real project. Status:
+    <span id="status">loading…</span>
+  </p>
+
+  <section>
+    <h2>Buttons</h2>
+    <div class="row">
+      <ga-button variant="primary">Primary</ga-button>
+      <ga-button variant="secondary">Secondary</ga-button>
+      <ga-button variant="ghost">Ghost</ga-button>
+      <ga-button variant="danger">Danger</ga-button>
+    </div>
+  </section>
+
+  <section>
+    <h2>Badges</h2>
+    <div class="row">
+      <ga-badge color="blue">Blue</ga-badge>
+      <ga-badge color="green" solid>Active</ga-badge>
+      <ga-badge color="amber">Pending</ga-badge>
+      <ga-badge color="red">Error</ga-badge>
+    </div>
+  </section>
+
+  <section>
+    <h2>Card + form</h2>
+    <ga-card style="max-width:360px">
+      <span slot="header">Sign in</span>
+      <div class="row" style="flex-direction:column; align-items:stretch; gap:14px;">
+        <ga-input label="Email" type="email" placeholder="you@example.com"></ga-input>
+        <ga-switch label="Remember me" checked></ga-switch>
+        <ga-button variant="primary" block>Continue</ga-button>
+      </div>
+    </ga-card>
+  </section>
+
+  <section>
+    <h2>Feedback</h2>
+    <div class="row" style="flex-direction:column; align-items:stretch;">
+      <ga-alert tone="success" title="It works">If you can read this styled, the kit renders on your browser.</ga-alert>
+      <div class="row"><ga-spinner></ga-spinner> <ga-avatar name="German Arutyunov"></ga-avatar> <ga-kbd>⌘</ga-kbd></div>
+    </div>
+  </section>
+
+  <pre id="diag"></pre>
+
+  <script>
+    // Surface any error on-screen (mobile has no console).
+    var diag = document.getElementById("diag");
+    function show(msg) { diag.style.display = "block"; diag.textContent += msg + "\n"; }
+    window.addEventListener("error", function (e) {
+      show("ERROR: " + (e.message || e.error) + (e.filename ? "  @ " + e.filename + ":" + e.lineno : ""));
+    });
+    window.addEventListener("unhandledrejection", function (e) {
+      show("PROMISE REJECTION: " + (e.reason && e.reason.message ? e.reason.message : e.reason));
+    });
+  </script>
+  <script type="module">
+    var status = document.getElementById("status");
+    try {
+      await import("../src/index.js");
+      // Give custom elements a tick to upgrade, then report.
+      await customElements.whenDefined("ga-button");
+      var b = document.querySelector("ga-button");
+      var ok = b && b.shadowRoot && b.shadowRoot.querySelector(".btn");
+      status.textContent = ok ? "✅ components defined & rendered" : "⚠️ defined but no shadow content";
+      status.style.background = ok ? "#003314" : "#332600";
+      status.style.color = ok ? "#00c758" : "#fcbb00";
+    } catch (err) {
+      status.textContent = "❌ module failed to load";
+      status.style.background = "#330000"; status.style.color = "#ff6568";
+      document.getElementById("diag").style.display = "block";
+      document.getElementById("diag").textContent += "IMPORT FAILED: " + (err && err.message ? err.message : err) + "\n";
+    }
+  </script>
+</body>
+</html>
