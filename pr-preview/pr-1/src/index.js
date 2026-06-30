@@ -29,6 +29,7 @@ import "./components/file-drop/file-drop.js";
 import "./components/fab/fab.js";
 import "./components/panel/panel.js";
 import "./components/slider/slider.js";
+import "./components/header/header.js";
 
 export { GaButton } from "./components/button/button.js";
 export { GaBadge } from "./components/badge/badge.js";
@@ -45,3 +46,4 @@ export { GaFileDrop } from "./components/file-drop/file-drop.js";
 export { GaFab } from "./components/fab/fab.js";
 export { GaPanel } from "./components/panel/panel.js";
 export { GaSlider } from "./components/slider/slider.js";
+export { GaHeader } from "./components/header/header.js";
