@@ -1,10 +1,14 @@
-import{j as e,M as i}from"./index-CQSL2Mkc.js";import{useMDXComponents as r}from"./index-C9hqAsDz.js";import"./iframe-Dbk0aXqD.js";import"./_commonjsHelpers-Cpj98o6Y.js";import"./index-Ca4lBP7z.js";import"./index-Bhqu_tAV.js";function s(t){const n={a:"a",code:"code",h1:"h1",h2:"h2",p:"p",pre:"pre",strong:"strong",...r(),...t.components};return e.jsxs(e.Fragment,{children:[e.jsx(i,{title:"Introduction"}),`
+import{j as e,M as r}from"./index-BB6Ott-_.js";import{useMDXComponents as o}from"./index-C6vTsy7U.js";import"./iframe-DQ1YQijL.js";import"./_commonjsHelpers-Cpj98o6Y.js";import"./index-Ca4lBP7z.js";import"./index-Bhqu_tAV.js";function s(t){const n={a:"a",blockquote:"blockquote",code:"code",h1:"h1",h2:"h2",p:"p",pre:"pre",strong:"strong",...o(),...t.components};return e.jsxs(e.Fragment,{children:[e.jsx(r,{title:"Introduction"}),`
 `,e.jsxs("div",{style:{maxWidth:760},children:[e.jsx(n.h1,{id:"ga-ui-kit",children:"GA UI Kit"}),e.jsxs(n.p,{children:["A ",e.jsx(n.strong,{children:"universal, zero-dependency UI kit"})," built on native ",e.jsx(n.strong,{children:"Web Components"}),`. The
 visual language is distilled from two projects — the
 `,e.jsx(n.a,{href:"https://github.com/gaarutyunov/garutyunov.com",rel:"nofollow",children:"garutyunov.com"}),` portfolio and the
 `,e.jsx(n.a,{href:"https://github.com/gaarutyunov/stereoscope",rel:"nofollow",children:"stereoscope"}),` converter — into a single
 Geist-inspired, pure-black design system.`]}),e.jsxs(n.p,{children:["Because every component is a standard custom element (",e.jsx(n.code,{children:"ga-*"}),"), it runs ",e.jsx(n.strong,{children:"anywhere"}),`:
-vanilla HTML, React, Astro, Vue, Svelte, SolidJS — no framework adapter required.`]}),e.jsx(n.h2,{id:"quick-start",children:"Quick start"}),e.jsx(n.pre,{children:e.jsx(n.code,{className:"language-html",children:`<!-- 1. Theme (optional but recommended) -->
+vanilla HTML, React, Astro, Vue, Svelte, SolidJS — no framework adapter required.`]}),e.jsxs(n.blockquote,{children:[`
+`,e.jsxs(n.p,{children:["📱 ",e.jsx(n.strong,{children:"On a phone?"}),` This Storybook UI is desktop-oriented. For a mobile-friendly
+tour of every component (no Storybook), open the
+`,e.jsx(n.a,{href:"demo/test.html",children:e.jsx(n.strong,{children:"standalone showcase"})}),"."]}),`
+`]}),e.jsx(n.h2,{id:"quick-start",children:"Quick start"}),e.jsx(n.pre,{children:e.jsx(n.code,{className:"language-html",children:`<!-- 1. Theme (optional but recommended) -->
 <link rel="stylesheet" href="https://esm.sh/@gaarutyunov/ui-kit/tokens.css" />
 
 <!-- 2. Components (registers every <ga-*> element) -->
@@ -27,4 +31,4 @@ import "@gaarutyunov/ui-kit/tokens.css"; // global theme
 | `,e.jsx(n.strong,{children:"Framework portability"}),` | Native custom elements — no React/Vue-specific build |
 | `,e.jsx(n.strong,{children:"Style isolation"}),` | Shadow DOM; host page styles can't leak in |
 | `,e.jsx(n.strong,{children:"Theming"}),` | CSS custom properties pierce the shadow boundary |
-| `,e.jsx(n.strong,{children:"Zero runtime deps"})," | ~3 KB base class, no Lit/Stencil |"]}),e.jsxs(n.p,{children:["Browse the ",e.jsx(n.strong,{children:"Components"})," and ",e.jsx(n.strong,{children:"Foundations"})," sections in the sidebar to explore."]})]})]})}function u(t={}){const{wrapper:n}={...r(),...t.components};return n?e.jsx(n,{...t,children:e.jsx(s,{...t})}):s(t)}export{u as default};
+| `,e.jsx(n.strong,{children:"Zero runtime deps"})," | ~3 KB base class, no Lit/Stencil |"]}),e.jsxs(n.p,{children:["Browse the ",e.jsx(n.strong,{children:"Components"})," and ",e.jsx(n.strong,{children:"Foundations"})," sections in the sidebar to explore."]})]})]})}function u(t={}){const{wrapper:n}={...o(),...t.components};return n?e.jsx(n,{...t,children:e.jsx(s,{...t})}):s(t)}export{u as default};

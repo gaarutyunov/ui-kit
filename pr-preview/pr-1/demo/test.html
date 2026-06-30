@@ -2,72 +2,111 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>GA UI Kit — standalone demo</title>
-  <link rel="icon" href="data:," /><!-- suppress favicon 404 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>GA UI Kit — showcase</title>
+  <link rel="icon" href="data:," />
   <!-- Theme tokens. Relative path so it works under any deploy base. -->
   <link rel="stylesheet" href="../src/tokens/tokens.css" />
   <style>
-    body { margin: 0; padding: 24px; max-width: 720px; }
-    h1 { font-size: 22px; margin: 0 0 4px; }
-    p.sub { color: var(--ga-muted, #888); margin: 0 0 24px; font-size: 14px; }
-    section { margin: 0 0 28px; }
-    h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em;
-         color: var(--ga-muted, #888); margin: 0 0 12px; font-weight: 600; }
+    body { margin: 0 auto; padding: 24px 20px 96px; max-width: 760px; }
+    header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin: 0 0 4px; }
+    h1 { font-size: clamp(24px, 6vw, 34px); margin: 0; letter-spacing: -0.02em; }
+    p.sub { color: var(--ga-muted, #888); margin: 6px 0 28px; font-size: 15px; line-height: 1.5; }
+    p.sub a { color: var(--ga-accent, #54a2ff); }
+    section { margin: 0 0 34px; }
+    h2 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em;
+         color: var(--ga-muted, #888); margin: 0 0 14px; font-weight: 600; }
     .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
-    /* On-screen diagnostics so errors are visible on mobile without dev tools. */
+    .col { display: flex; flex-direction: column; gap: 14px; align-items: stretch; }
+    .themebtn { font: 13px/1 ui-monospace, monospace; color: var(--ga-fg, #ededed);
+      background: var(--ga-bg-elev, #1a1a1a); border: 1px solid var(--ga-border-strong, #2a2a2a);
+      border-radius: 9999px; padding: 8px 14px; cursor: pointer; white-space: nowrap; }
+    #status { display: inline-block; padding: 3px 9px; border-radius: 9999px; font: 11px/1.4 ui-monospace, monospace; }
     #diag { position: fixed; left: 0; right: 0; bottom: 0; max-height: 45vh; overflow: auto;
             background: #2a0000; color: #ffb3b3; font: 12px/1.5 ui-monospace, monospace;
             padding: 12px 16px; border-top: 2px solid #ff6568; display: none; white-space: pre-wrap; }
-    #status { display: inline-block; padding: 4px 10px; border-radius: 9999px; font-size: 12px;
-              font-family: ui-monospace, monospace; }
   </style>
 </head>
 <body class="ga-theme">
-  <h1>GA UI Kit — standalone demo</h1>
+  <header>
+    <div>
+      <h1>GA UI Kit</h1>
+    </div>
+    <button class="themebtn" id="theme" type="button">◑ theme</button>
+  </header>
   <p class="sub">
-    No Storybook here — just the raw Web Components loaded as ES modules, the way
-    you'd use them in a real project. Status:
-    <span id="status">loading…</span>
+    A universal, zero-dependency Web Components kit — rendered here with no
+    framework and no Storybook, straight from ES modules.
+    <br />Status: <span id="status">loading…</span>
   </p>
 
   <section>
     <h2>Buttons</h2>
-    <div class="row">
-      <ga-button variant="primary">Primary</ga-button>
-      <ga-button variant="secondary">Secondary</ga-button>
-      <ga-button variant="ghost">Ghost</ga-button>
-      <ga-button variant="danger">Danger</ga-button>
+    <div class="col">
+      <div class="row">
+        <ga-button variant="primary">Primary</ga-button>
+        <ga-button variant="secondary">Secondary</ga-button>
+        <ga-button variant="ghost">Ghost</ga-button>
+        <ga-button variant="danger">Danger</ga-button>
+      </div>
+      <div class="row">
+        <ga-button variant="primary" size="sm">Small</ga-button>
+        <ga-button variant="primary" size="md">Medium</ga-button>
+        <ga-button variant="primary" size="lg">Large</ga-button>
+        <ga-button variant="primary" loading>Loading</ga-button>
+        <ga-button variant="primary" disabled>Disabled</ga-button>
+      </div>
     </div>
   </section>
 
   <section>
     <h2>Badges</h2>
     <div class="row">
+      <ga-badge>Default</ga-badge>
       <ga-badge color="blue">Blue</ga-badge>
       <ga-badge color="green" solid>Active</ga-badge>
       <ga-badge color="amber">Pending</ga-badge>
+      <ga-badge color="purple">Beta</ga-badge>
       <ga-badge color="red">Error</ga-badge>
     </div>
   </section>
 
   <section>
     <h2>Card + form</h2>
-    <ga-card style="max-width:360px">
+    <ga-card style="max-width:380px">
       <span slot="header">Sign in</span>
-      <div class="row" style="flex-direction:column; align-items:stretch; gap:14px;">
-        <ga-input label="Email" type="email" placeholder="you@example.com"></ga-input>
+      <div class="col">
+        <ga-input label="Email" type="email" placeholder="you@example.com" hint="We'll never share it."></ga-input>
         <ga-switch label="Remember me" checked></ga-switch>
         <ga-button variant="primary" block>Continue</ga-button>
       </div>
+      <div slot="footer">Press <ga-kbd>⌘</ga-kbd> <ga-kbd>↵</ga-kbd> to submit</div>
     </ga-card>
   </section>
 
   <section>
+    <h2>Tabs</h2>
+    <ga-tabs style="max-width:480px"
+      tabs='[{"id":"local","label":"Local"},{"id":"cloud","label":"Cloud"},{"id":"about","label":"About"}]'>
+      <div slot="local" style="color:var(--ga-muted)">On-device depth estimation with WebGPU.</div>
+      <div slot="cloud" style="color:var(--ga-muted)">AI-powered editing via OpenRouter.</div>
+      <div slot="about" style="color:var(--ga-muted)">A buildless converter shipped as static ES modules.</div>
+    </ga-tabs>
+  </section>
+
+  <section>
     <h2>Feedback</h2>
-    <div class="row" style="flex-direction:column; align-items:stretch;">
-      <ga-alert tone="success" title="It works">If you can read this styled, the kit renders on your browser.</ga-alert>
-      <div class="row"><ga-spinner></ga-spinner> <ga-avatar name="German Arutyunov"></ga-avatar> <ga-kbd>⌘</ga-kbd></div>
+    <div class="col">
+      <ga-alert tone="info" title="Heads up">Local processing is available in this browser.</ga-alert>
+      <ga-alert tone="success" title="It works">If this is styled, the kit renders on your browser. 🎉</ga-alert>
+      <ga-alert tone="warning" title="Warning">Large images may take a while.</ga-alert>
+      <ga-alert tone="danger" title="Error" dismissible>Could not load the depth model.</ga-alert>
+      <div class="row">
+        <ga-spinner></ga-spinner>
+        <ga-avatar name="German Arutyunov"></ga-avatar>
+        <ga-avatar name="German Arutyunov" square></ga-avatar>
+        <ga-kbd>Esc</ga-kbd>
+      </div>
     </div>
   </section>
 
@@ -83,10 +122,13 @@
     window.addEventListener("unhandledrejection", function (e) {
       show("PROMISE REJECTION: " + (e.reason && e.reason.message ? e.reason.message : e.reason));
     });
+    // Dark / light toggle (tokens.css reads [data-theme] on <html>).
+    document.getElementById("theme").addEventListener("click", function () {
+      var el = document.documentElement;
+      el.setAttribute("data-theme", el.getAttribute("data-theme") === "light" ? "dark" : "light");
+    });
   </script>
   <script type="module">
-    // Wrapped in an async IIFE (no top-level await) so this diagnostic page
-    // parses and runs even on older engines — the status badge always updates.
     var status = document.getElementById("status");
     (async function () {
       try {
@@ -94,14 +136,14 @@
         await customElements.whenDefined("ga-button");
         var b = document.querySelector("ga-button");
         var ok = b && b.shadowRoot && b.shadowRoot.querySelector(".btn");
-        status.textContent = ok ? "✅ components defined & rendered" : "⚠️ defined but no shadow content";
+        status.textContent = ok ? "✅ rendered" : "⚠️ defined but no shadow content";
         status.style.background = ok ? "#003314" : "#332600";
         status.style.color = ok ? "#00c758" : "#fcbb00";
       } catch (err) {
         status.textContent = "❌ module failed to load";
         status.style.background = "#330000"; status.style.color = "#ff6568";
-        document.getElementById("diag").style.display = "block";
-        document.getElementById("diag").textContent += "IMPORT FAILED: " + (err && err.message ? err.message : err) + "\n";
+        diag.style.display = "block";
+        diag.textContent += "IMPORT FAILED: " + (err && err.message ? err.message : err) + "\n";
       }
     })();
   </script>
