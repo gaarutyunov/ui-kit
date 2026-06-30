@@ -72,7 +72,7 @@
 
   /* ---- Shape ------------------------------------------------------------ */
   --ga-radius: 6px;
-  --ga-radius-lg: 12px;
+  --ga-radius-lg: 8px; /* matches Tailwind rounded-lg used by garutyunov.com cards */
   --ga-radius-full: 9999px;
 
   /* ---- Elevation -------------------------------------------------------- */

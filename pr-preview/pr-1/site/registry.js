@@ -36,6 +36,11 @@ export const NAV = [
       { id: "alert", label: "Alert" },
       { id: "kbd", label: "Kbd" },
       { id: "tabs", label: "Tabs" },
+      { id: "note", label: "Note" },
+      { id: "slider", label: "Slider" },
+      { id: "file-drop", label: "File drop" },
+      { id: "fab", label: "FAB" },
+      { id: "panel", label: "Panel" },
     ],
   },
 ];
@@ -360,6 +365,118 @@ export const COMPONENTS = {
       { name: "active", type: "string", def: "first", desc: "Active tab id (reflected)." },
     ],
     events: [{ name: "change", desc: "Fires on tab switch. detail: { id }." }],
+  },
+
+  note: {
+    title: "Note",
+    tag: "ga-note",
+    lead: "An inline note / callout with a colored left strip — ported from stereoscope's converter note.",
+    playground: {
+      tag: "ga-note",
+      slot: "Local processing is available in this browser.",
+      attrs: [
+        { name: "tone", type: "select", options: ["info", "success", "warning", "error", "neutral"], value: "info" },
+        { name: "title", type: "text", value: "Heads up" },
+      ],
+    },
+    examples: [
+      { title: "Tones", code: `<div style="display:flex; flex-direction:column; gap:12px; max-width:520px;">
+  <ga-note tone="info" title="Info">Local processing is available.</ga-note>
+  <ga-note tone="success" title="Success">Export complete — 3D pair saved.</ga-note>
+  <ga-note tone="warning" title="Warning">Large images may take a while.</ga-note>
+  <ga-note tone="error" title="Error">Could not load the depth model.</ga-note>
+</div>` },
+    ],
+    api: [
+      { name: "tone", type: `"info" | "success" | "warning" | "error" | "neutral"`, def: "info", desc: "Left-strip color." },
+      { name: "title", type: "string", def: "—", desc: "Optional heading." },
+    ],
+    slots: [{ name: "(default)", desc: "Message body." }],
+  },
+
+  slider: {
+    title: "Slider",
+    tag: "ga-slider",
+    lead: "A range slider with an optional label and live value readout. Form-associated.",
+    examples: [
+      { title: "Default", code: `<div style="display:flex; flex-direction:column; gap:20px; max-width:360px;">
+  <ga-slider label="Depth" value="65"></ga-slider>
+  <ga-slider label="Disabled" value="40" disabled></ga-slider>
+</div>` },
+    ],
+    api: [
+      { name: "min / max / step", type: "number", def: "0 / 100 / 1", desc: "Range bounds." },
+      { name: "value", type: "number", def: "50", desc: "Current value (reflected on set)." },
+      { name: "label", type: "string", def: "—", desc: "Label above the track." },
+      { name: "disabled", type: "boolean", def: "false", desc: "Disable interaction." },
+    ],
+    events: [
+      { name: "input", desc: "Fires while dragging. detail: { value }." },
+      { name: "change", desc: "Fires on release. detail: { value }." },
+    ],
+  },
+
+  "file-drop": {
+    title: "File drop",
+    tag: "ga-file-drop",
+    lead: "A drag-and-drop file upload area — ported from stereoscope's dropzone. Click to browse or drop files.",
+    examples: [
+      { title: "Default", code: `<ga-file-drop multiple accept="image/*" style="max-width:420px; display:block;">
+  PNG, JPG, or WebP up to 20MB
+</ga-file-drop>` },
+    ],
+    api: [
+      { name: "accept", type: "string", def: "—", desc: "Native file-input accept filter." },
+      { name: "multiple", type: "boolean", def: "false", desc: "Allow selecting multiple files." },
+      { name: "label", type: "string", def: "Drop files…", desc: "Primary prompt text." },
+    ],
+    events: [{ name: "files", desc: "Fires on drop or selection. detail: { files: File[] }." }],
+    slots: [{ name: "(default)", desc: "Secondary hint text." }],
+  },
+
+  fab: {
+    title: "FAB",
+    tag: "ga-fab",
+    lead: "A floating action button — ported from stereoscope's curtain toggle. Fixed bottom-right by default; shown inline here via position=\"static\".",
+    examples: [
+      { title: "Colors", code: `<ga-fab position="static" label="Add">+</ga-fab>
+<ga-fab position="static" color="green" label="Confirm">✓</ga-fab>
+<ga-fab position="static" color="red" label="Delete">×</ga-fab>` },
+    ],
+    api: [
+      { name: "color", type: `"" | "green" | "amber" | "purple" | "red"`, def: "accent", desc: "Background color." },
+      { name: "position", type: `"bottom-right" | "bottom-left" | "static"`, def: "bottom-right", desc: "Placement (use static to inline)." },
+      { name: "label", type: "string", def: "Action", desc: "Accessible label." },
+    ],
+    slots: [{ name: "(default)", desc: "Icon / glyph (defaults to +)." }],
+  },
+
+  panel: {
+    title: "Panel",
+    tag: "ga-panel",
+    lead: "A slide-in drawer with a backdrop — ported from stereoscope's curtain. Close via ×, the scrim, or Escape.",
+    examples: [
+      { title: "Drawer", code: `<ga-button variant="primary" onclick="this.nextElementSibling.show()">Open panel</ga-button>
+<ga-panel title="Settings">
+  <p style="margin:0 0 14px;">Drawer body content goes here.</p>
+  <ga-switch label="Enable previews" checked></ga-switch>
+  <div slot="footer"><ga-button variant="primary" onclick="this.closest('ga-panel').close()">Done</ga-button></div>
+</ga-panel>` },
+    ],
+    api: [
+      { name: "open", type: "boolean", def: "false", desc: "Reflected open state." },
+      { name: "side", type: `"right" | "left"`, def: "right", desc: "Edge it slides from." },
+      { name: "title", type: "string", def: "—", desc: "Header text (or use the header slot)." },
+    ],
+    events: [
+      { name: "open", desc: "Fires when opened." },
+      { name: "close", desc: "Fires when closed." },
+    ],
+    slots: [
+      { name: "header", desc: "Header content (overrides title)." },
+      { name: "(default)", desc: "Body content." },
+      { name: "footer", desc: "Footer actions." },
+    ],
   },
 };
 
