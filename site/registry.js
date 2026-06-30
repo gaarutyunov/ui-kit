@@ -41,6 +41,7 @@ export const NAV = [
       { id: "file-drop", label: "File drop" },
       { id: "fab", label: "FAB" },
       { id: "panel", label: "Panel" },
+      { id: "header", label: "Header" },
     ],
   },
 ];
@@ -476,6 +477,29 @@ export const COMPONENTS = {
       { name: "header", desc: "Header content (overrides title)." },
       { name: "(default)", desc: "Body content." },
       { name: "footer", desc: "Footer actions." },
+    ],
+  },
+
+  header: {
+    title: "Header",
+    tag: "ga-header",
+    lead: "A sticky app header with a brand and slotted nav actions — matches the garutyunov.com header.",
+    examples: [
+      { title: "Default", code: `<ga-header brand="German Arutyunov" href="#" static
+  style="border:1px solid var(--ga-border); border-radius:var(--ga-radius); display:block;">
+  <a href="#">CV</a>
+  <a href="#">GitHub</a>
+  <a href="#">LinkedIn</a>
+</ga-header>` },
+    ],
+    api: [
+      { name: "brand", type: "string", def: "—", desc: "Brand text (or use the brand slot)." },
+      { name: "href", type: "string", def: "—", desc: "Brand link target." },
+      { name: "static", type: "boolean", def: "false", desc: "Disable sticky positioning (for embedding)." },
+    ],
+    slots: [
+      { name: "brand", desc: "Custom brand content (overrides the brand attribute)." },
+      { name: "(default)", desc: "Right-aligned nav actions (links, buttons)." },
     ],
   },
 };
