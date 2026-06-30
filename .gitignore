@@ -6,3 +6,6 @@ storybook-static/
 .env.*
 dist/
 *.tsbuildinfo
+# scratch/probe artifacts
+_*.mjs
+_*.png
