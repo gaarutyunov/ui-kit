@@ -10,7 +10,12 @@ pure-black design system:
 - [**garutyunov.com**](https://github.com/gaarutyunov/garutyunov.com) — a Next.js portfolio
 - [**stereoscope**](https://github.com/gaarutyunov/stereoscope) — a buildless WebGPU image converter
 
-📖 **[Live Storybook →](https://gaarutyunov.github.io/ui-kit/)**
+📖 **[Live Storybook →](https://gaarutyunov.github.io/ui-kit/)** (best on desktop)
+&nbsp;·&nbsp; 📱 **[Standalone showcase →](https://gaarutyunov.github.io/ui-kit/demo/test.html)** (works everywhere, incl. mobile Safari)
+
+> Storybook is a desktop-oriented dev tool and its preview UI can render
+> unreliably on mobile browsers. The standalone showcase loads the components
+> as plain ES modules with no Storybook, so it renders in any browser.
 
 ---
 
