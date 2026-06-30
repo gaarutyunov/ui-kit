@@ -84,15 +84,18 @@ export class GaInput extends GaElement {
     const input = this.$("input");
     if (!input) return;
     input.addEventListener("input", () => {
-      this.setAttribute("value", input.value);
+      // Keep the underlying property + form value in sync, but do NOT reflect
+      // back to the observed `value` attribute — that would re-render the
+      // shadow tree on every keystroke and drop focus.
+      this._value = input.value;
       this._internals?.setFormValue(input.value);
       this.emit("input", { value: input.value });
     });
     input.addEventListener("change", () => this.emit("change", { value: input.value }));
   }
 
-  get value() { return this.$("input")?.value ?? this.attr("value"); }
-  set value(v) { this.setAttribute("value", v); }
+  get value() { return this.$("input")?.value ?? this._value ?? this.attr("value"); }
+  set value(v) { this._value = v; this.setAttribute("value", v); }
 }
 
 define("ga-input", GaInput);

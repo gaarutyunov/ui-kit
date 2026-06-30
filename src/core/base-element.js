@@ -2,14 +2,18 @@
    GaElement — a tiny base class for the kit's Web Components.
 
    Zero dependencies. Provides:
-     - a Shadow DOM root with a shared "reset" stylesheet (so tokens inherit
-       in and host pages can't leak styles in),
-     - constructable-stylesheet caching (one CSSStyleSheet per component, not
-       one per instance),
+     - a Shadow DOM root styled with a plain <style> element (works in every
+       browser that supports Shadow DOM, including all Safari versions — no
+       reliance on constructable stylesheets / adoptedStyleSheets),
      - attribute -> re-render reactivity,
      - small helpers (`$`, `emit`).
 
    Custom-element tag names are namespaced `ga-*`.
+
+   Note on styling: earlier versions used `adoptedStyleSheets`. That API is
+   only supported in Safari 16.4+ and can fail silently on older WebKit,
+   leaving components unstyled with no console error. Injecting a <style> tag
+   is universally supported, so we use that instead.
    ========================================================================= */
 
 /** Shared reset applied to every component's shadow root. */
@@ -25,21 +29,6 @@ const RESET = /* css */ `
   }
 `;
 
-/** Cache of tag -> CSSStyleSheet so styles are parsed once per component. */
-const sheetCache = new Map();
-
-function makeSheet(key, css) {
-  let sheet = sheetCache.get(key);
-  if (!sheet) {
-    sheet = new CSSStyleSheet();
-    sheet.replaceSync(css);
-    sheetCache.set(key, sheet);
-  }
-  return sheet;
-}
-
-const resetSheet = makeSheet("__reset__", RESET);
-
 export class GaElement extends HTMLElement {
   /** Subclasses override these. */
   static styles = "";
@@ -49,11 +38,17 @@ export class GaElement extends HTMLElement {
     return this.observed;
   }
 
+  /** Lazily build (once per subclass) the combined reset + component CSS. */
+  static get _css() {
+    if (!Object.prototype.hasOwnProperty.call(this, "_cssCache")) {
+      this._cssCache = RESET + (this.styles || "");
+    }
+    return this._cssCache;
+  }
+
   constructor() {
     super();
     this.attachShadow({ mode: "open", delegatesFocus: true });
-    const sheet = makeSheet(this.localName, this.constructor.styles);
-    this.shadowRoot.adoptedStyleSheets = [resetSheet, sheet];
     this._mounted = false;
   }
 
@@ -72,7 +67,8 @@ export class GaElement extends HTMLElement {
   }
 
   render() {
-    this.shadowRoot.innerHTML = this.template();
+    this.shadowRoot.innerHTML =
+      "<style>" + this.constructor._css + "</style>" + this.template();
   }
 
   /** Query inside the shadow root. */
