@@ -143,8 +143,12 @@ function playground(pg) {
       const sel = el("select", { class: "pg-select", onchange: (e) => { state[a.name] = e.target.value; update(); } },
         ...a.options.map((o) => el("option", { value: o, ...(o === a.value ? { selected: "" } : {}) }, o)));
       field = el("label", { class: "pg-field" }, el("span", {}, a.name), sel);
+    } else if (a.type === "text") {
+      const inp = el("ga-input", { label: a.name, value: a.value ?? "" });
+      inp.addEventListener("input", (e) => { state[a.name] = e.detail.value; update(); });
+      field = el("div", { class: "pg-field-wide" }, inp);
     }
-    controls.append(field);
+    if (field) controls.append(field);
   }
   if (pg.slot != null) {
     const inp = el("ga-input", { label: "(slot text)", value: slot });
@@ -269,6 +273,25 @@ function escapeHtml(s) {
   return String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
+/* ---- breadcrumbs (mirrors garutyunov.com's skill-page nav) -------------- */
+function titleOf(id) {
+  if (id === "colors") return "Colors";
+  if (id === "typography") return "Typography";
+  return allPages()[id]?.title || "GA UI Kit";
+}
+function groupOf(id) {
+  for (const g of NAV) if (g.items.some((i) => i.id === id)) return g.title;
+  return null;
+}
+function breadcrumbs(id) {
+  const nav = el("nav", { class: "crumbs", "aria-label": "Breadcrumb" });
+  nav.append(el("a", { href: "#/introduction" }, "GA UI Kit"));
+  const group = groupOf(id);
+  if (group) nav.append(el("span", { class: "sep" }, "/"), el("span", {}, group));
+  nav.append(el("span", { class: "sep" }, "/"), el("span", { class: "current" }, titleOf(id)));
+  return nav;
+}
+
 /* ---- router ------------------------------------------------------------- */
 let shell;
 function currentId() {
@@ -291,7 +314,7 @@ function route() {
     location.hash = "#/introduction";
     return;
   }
-  page.append(content);
+  page.append(breadcrumbs(id), content);
   page.scrollTop = 0;
   document.querySelector(".content")?.scrollTo(0, 0);
   const title = (allPages()[id]?.title) || (id === "colors" ? "Colors" : id === "typography" ? "Typography" : "GA UI Kit");
