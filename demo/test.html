@@ -85,22 +85,25 @@
     });
   </script>
   <script type="module">
+    // Wrapped in an async IIFE (no top-level await) so this diagnostic page
+    // parses and runs even on older engines — the status badge always updates.
     var status = document.getElementById("status");
-    try {
-      await import("../src/index.js");
-      // Give custom elements a tick to upgrade, then report.
-      await customElements.whenDefined("ga-button");
-      var b = document.querySelector("ga-button");
-      var ok = b && b.shadowRoot && b.shadowRoot.querySelector(".btn");
-      status.textContent = ok ? "✅ components defined & rendered" : "⚠️ defined but no shadow content";
-      status.style.background = ok ? "#003314" : "#332600";
-      status.style.color = ok ? "#00c758" : "#fcbb00";
-    } catch (err) {
-      status.textContent = "❌ module failed to load";
-      status.style.background = "#330000"; status.style.color = "#ff6568";
-      document.getElementById("diag").style.display = "block";
-      document.getElementById("diag").textContent += "IMPORT FAILED: " + (err && err.message ? err.message : err) + "\n";
-    }
+    (async function () {
+      try {
+        await import("../src/index.js");
+        await customElements.whenDefined("ga-button");
+        var b = document.querySelector("ga-button");
+        var ok = b && b.shadowRoot && b.shadowRoot.querySelector(".btn");
+        status.textContent = ok ? "✅ components defined & rendered" : "⚠️ defined but no shadow content";
+        status.style.background = ok ? "#003314" : "#332600";
+        status.style.color = ok ? "#00c758" : "#fcbb00";
+      } catch (err) {
+        status.textContent = "❌ module failed to load";
+        status.style.background = "#330000"; status.style.color = "#ff6568";
+        document.getElementById("diag").style.display = "block";
+        document.getElementById("diag").textContent += "IMPORT FAILED: " + (err && err.message ? err.message : err) + "\n";
+      }
+    })();
   </script>
 </body>
 </html>
