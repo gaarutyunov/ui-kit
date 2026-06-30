@@ -1,4 +1,4 @@
-var _=Object.defineProperty;var $=(t,a,e)=>a in t?_(t,a,{enumerable:!0,configurable:!0,writable:!0,value:e}):t[a]=e;var r=(t,a,e)=>$(t,typeof a!="symbol"?a+"":a,e);const z=`
+var y=Object.defineProperty;var _=(r,a,e)=>a in r?y(r,a,{enumerable:!0,configurable:!0,writable:!0,value:e}):r[a]=e;var t=(r,a,e)=>_(r,typeof a!="symbol"?a+"":a,e);const w=`
   :host {
     box-sizing: border-box;
     font-family: var(--ga-font-sans, ui-sans-serif, system-ui, sans-serif);
@@ -8,14 +8,14 @@ var _=Object.defineProperty;var $=(t,a,e)=>a in t?_(t,a,{enumerable:!0,configura
   @media (prefers-reduced-motion: reduce) {
     * { transition-duration: 0.001ms !important; animation-duration: 0.001ms !important; }
   }
-`,k=new Map;function y(t,a){let e=k.get(t);return e||(e=new CSSStyleSheet,e.replaceSync(a),k.set(t,e)),e}const F=y("__reset__",z);class i extends HTMLElement{static get observedAttributes(){return this.observed}constructor(){super(),this.attachShadow({mode:"open",delegatesFocus:!0});const a=y(this.localName,this.constructor.styles);this.shadowRoot.adoptedStyleSheets=[F,a],this._mounted=!1}connectedCallback(){this._mounted=!0,this.render()}attributeChangedCallback(){this._mounted&&this.render()}template(){return""}render(){this.shadowRoot.innerHTML=this.template()}$(a){return this.shadowRoot.querySelector(a)}emit(a,e){this.dispatchEvent(new CustomEvent(a,{detail:e,bubbles:!0,composed:!0}))}hasFlag(a){return this.hasAttribute(a)}attr(a,e=""){return this.getAttribute(a)??e}}r(i,"styles",""),r(i,"observed",[]);function n(t,a){customElements.get(t)||customElements.define(t,a)}function o(t){return String(t??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}class h extends i{constructor(){super(...arguments);r(this,"_guard",e=>{(this.hasFlag("disabled")||this.hasFlag("loading"))&&(e.stopImmediatePropagation(),e.preventDefault())})}connectedCallback(){super.connectedCallback(),this.addEventListener("click",this._guard,!0)}disconnectedCallback(){this.removeEventListener("click",this._guard,!0)}template(){const e=this.attr("href"),s=e?"a":"button",d=e?`href="${o(e)}"`:`type="button"${this.hasFlag("disabled")?" disabled":""}`,c=this.hasFlag("loading")?'<span class="spinner" aria-hidden="true"></span>':"";return`
-      <${s} class="btn" part="button" ${d}>
+`;class i extends HTMLElement{static get observedAttributes(){return this.observed}static get _css(){return Object.prototype.hasOwnProperty.call(this,"_cssCache")||(this._cssCache=w+(this.styles||"")),this._cssCache}constructor(){super(),this.attachShadow({mode:"open",delegatesFocus:!0}),this._mounted=!1}connectedCallback(){this._mounted=!0,this.render()}attributeChangedCallback(){this._mounted&&this.render()}template(){return""}render(){this.shadowRoot.innerHTML="<style>"+this.constructor._css+"</style>"+this.template()}$(a){return this.shadowRoot.querySelector(a)}emit(a,e){this.dispatchEvent(new CustomEvent(a,{detail:e,bubbles:!0,composed:!0}))}hasFlag(a){return this.hasAttribute(a)}attr(a,e=""){return this.getAttribute(a)??e}}t(i,"styles",""),t(i,"observed",[]);function n(r,a){customElements.get(r)||customElements.define(r,a)}function o(r){return String(r??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}class h extends i{constructor(){super(...arguments);t(this,"_guard",e=>{(this.hasFlag("disabled")||this.hasFlag("loading"))&&(e.stopImmediatePropagation(),e.preventDefault())})}connectedCallback(){super.connectedCallback(),this.addEventListener("click",this._guard,!0)}disconnectedCallback(){this.removeEventListener("click",this._guard,!0)}template(){const e=this.attr("href"),s=e?"a":"button",l=e?`href="${o(e)}"`:`type="button"${this.hasFlag("disabled")?" disabled":""}`,c=this.hasFlag("loading")?'<span class="spinner" aria-hidden="true"></span>':"";return`
+      <${s} class="btn" part="button" ${l}>
         <slot name="start"></slot>
         ${c}
         <slot></slot>
         <slot name="end"></slot>
       </${s}>
-    `}}r(h,"observed",["variant","size","href","disabled","loading","block"]),r(h,"styles",`
+    `}}t(h,"observed",["variant","size","href","disabled","loading","block"]),t(h,"styles",`
     :host { display: inline-block; }
     :host([block]) { display: block; }
 
@@ -97,7 +97,7 @@ var _=Object.defineProperty;var $=(t,a,e)=>a in t?_(t,a,{enumerable:!0,configura
     @keyframes spin { to { transform: rotate(360deg); } }
 
     ::slotted([slot="start"]), ::slotted([slot="end"]) { display: inline-flex; }
-  `);n("ga-button",h);class b extends i{template(){return'<span class="badge" part="badge"><slot></slot></span>'}}r(b,"observed",["color","solid","size"]),r(b,"styles",`
+  `);n("ga-button",h);class b extends i{template(){return'<span class="badge" part="badge"><slot></slot></span>'}}t(b,"observed",["color","solid","size"]),t(b,"styles",`
     :host { display: inline-block; }
     .badge {
       --_c: var(--ga-muted, #878787);
@@ -135,7 +135,7 @@ var _=Object.defineProperty;var $=(t,a,e)=>a in t?_(t,a,{enumerable:!0,configura
         <div class="body" part="body"><slot></slot></div>
         <div class="footer" part="footer"><slot name="footer"></slot></div>
       </${e}>
-    `}}r(v,"observed",["interactive","href","padding"]),r(v,"styles",`
+    `}}t(v,"observed",["interactive","href","padding"]),t(v,"styles",`
     :host { display: block; }
     .card {
       display: flex;
@@ -183,7 +183,7 @@ var _=Object.defineProperty;var $=(t,a,e)=>a in t?_(t,a,{enumerable:!0,configura
       color: var(--ga-muted, #878787);
       font-size: var(--ga-fs-sm, 14px);
     }
-  `);n("ga-card",v);class u extends i{_initials(a){return a.trim().split(/\s+/).slice(0,2).map(s=>{var d;return((d=s[0])==null?void 0:d.toUpperCase())??""}).join("")||"?"}template(){const a=this.attr("src"),e=this.attr("name",""),s=a?`<img src="${o(a)}" alt="${o(e)}" loading="lazy" />`:`<span aria-hidden="true">${o(this._initials(e))}</span>`;return`<div class="avatar" part="avatar" role="img" aria-label="${o(e)}">${s}</div>`}}r(u,"observed",["src","name","size","square"]),r(u,"styles",`
+  `);n("ga-card",v);class u extends i{_initials(a){return a.trim().split(/\s+/).slice(0,2).map(s=>{var l;return((l=s[0])==null?void 0:l.toUpperCase())??""}).join("")||"?"}template(){const a=this.attr("src"),e=this.attr("name",""),s=a?`<img src="${o(a)}" alt="${o(e)}" loading="lazy" />`:`<span aria-hidden="true">${o(this._initials(e))}</span>`;return`<div class="avatar" part="avatar" role="img" aria-label="${o(e)}">${s}</div>`}}t(u,"observed",["src","name","size","square"]),t(u,"styles",`
     :host { display: inline-block; }
     .avatar {
       display: inline-flex;
@@ -204,9 +204,9 @@ var _=Object.defineProperty;var $=(t,a,e)=>a in t?_(t,a,{enumerable:!0,configura
     :host([size="sm"]) .avatar { width: 28px; height: 28px; font-size: 11px; }
     :host([size="lg"]) .avatar { width: 64px; height: 64px; font-size: var(--ga-fs-lg, 20px); }
     img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  `);n("ga-avatar",u);class g extends i{constructor(){var a;super(),this._internals=(a=this.attachInternals)==null?void 0:a.call(this)}template(){const a=this.attr("label"),e=this.attr("error"),s=this.attr("hint"),d=this.hasFlag("required")?'<span class="req">*</span>':"";return`
+  `);n("ga-avatar",u);class g extends i{constructor(){var a;super(),this._internals=(a=this.attachInternals)==null?void 0:a.call(this)}template(){const a=this.attr("label"),e=this.attr("error"),s=this.attr("hint"),l=this.hasFlag("required")?'<span class="req">*</span>':"";return`
       <div class="field">
-        ${a?`<label part="label">${o(a)}${d}</label>`:""}
+        ${a?`<label part="label">${o(a)}${l}</label>`:""}
         <input
           part="input"
           type="${o(this.attr("type","text"))}"
@@ -218,7 +218,7 @@ var _=Object.defineProperty;var $=(t,a,e)=>a in t?_(t,a,{enumerable:!0,configura
         />
         ${e?`<span class="error" part="error">${o(e)}</span>`:s?`<span class="hint" part="hint">${o(s)}</span>`:""}
       </div>
-    `}render(){super.render();const a=this.$("input");a&&(a.addEventListener("input",()=>{var e;this.setAttribute("value",a.value),(e=this._internals)==null||e.setFormValue(a.value),this.emit("input",{value:a.value})}),a.addEventListener("change",()=>this.emit("change",{value:a.value})))}get value(){var a;return((a=this.$("input"))==null?void 0:a.value)??this.attr("value")}set value(a){this.setAttribute("value",a)}}r(g,"formAssociated",!0),r(g,"observed",["label","placeholder","type","value","name","hint","error","disabled","required"]),r(g,"styles",`
+    `}render(){super.render();const a=this.$("input");a&&(a.addEventListener("input",()=>{var e;this._value=a.value,(e=this._internals)==null||e.setFormValue(a.value),this.emit("input",{value:a.value})}),a.addEventListener("change",()=>this.emit("change",{value:a.value})))}get value(){var a;return((a=this.$("input"))==null?void 0:a.value)??this._value??this.attr("value")}set value(a){this._value=a,this.setAttribute("value",a)}}t(g,"formAssociated",!0),t(g,"observed",["label","placeholder","type","value","name","hint","error","disabled","required"]),t(g,"styles",`
     :host { display: block; }
     .field { display: flex; flex-direction: column; gap: 6px; }
     label {
@@ -261,7 +261,7 @@ var _=Object.defineProperty;var $=(t,a,e)=>a in t?_(t,a,{enumerable:!0,configura
         ><span class="knob" part="knob"></span></button>
         ${e?`<span class="label">${o(e)}</span>`:""}
       </label>
-    `}render(){var a;super.render(),(a=this.$("button"))==null||a.addEventListener("click",()=>this.toggle())}toggle(){if(this.hasFlag("disabled"))return;const a=!this.hasFlag("checked");this.toggleAttribute("checked",a),this.emit("change",{checked:a})}get checked(){return this.hasFlag("checked")}set checked(a){this.toggleAttribute("checked",!!a)}}r(p,"formAssociated",!0),r(p,"observed",["checked","disabled","label"]),r(p,"styles",`
+    `}render(){var a;super.render(),(a=this.$("button"))==null||a.addEventListener("click",()=>this.toggle())}toggle(){if(this.hasFlag("disabled"))return;const a=!this.hasFlag("checked");this.toggleAttribute("checked",a),this.emit("change",{checked:a})}get checked(){return this.hasFlag("checked")}set checked(a){this.toggleAttribute("checked",!!a)}}t(p,"formAssociated",!0),t(p,"observed",["checked","disabled","label"]),t(p,"styles",`
     :host { display: inline-block; }
     .wrap {
       display: inline-flex;
@@ -305,7 +305,7 @@ var _=Object.defineProperty;var $=(t,a,e)=>a in t?_(t,a,{enumerable:!0,configura
       background: var(--ga-accent-contrast, #000);
     }
     .label { font-size: var(--ga-fs-sm, 14px); color: var(--ga-fg, #ededed); }
-  `);n("ga-switch",p);class f extends i{template(){return'<div class="spinner" part="spinner" role="status" aria-label="Loading"></div>'}}r(f,"observed",["size","color"]),r(f,"styles",`
+  `);n("ga-switch",p);class f extends i{template(){return'<div class="spinner" part="spinner" role="status" aria-label="Loading"></div>'}}t(f,"observed",["size","color"]),t(f,"styles",`
     :host { display: inline-flex; }
     .spinner {
       width: 20px; height: 20px;
@@ -332,7 +332,7 @@ var _=Object.defineProperty;var $=(t,a,e)=>a in t?_(t,a,{enumerable:!0,configura
         </div>
         ${e}
       </div>
-    `}render(){var a;super.render(),(a=this.$(".close"))==null||a.addEventListener("click",()=>{this.emit("dismiss"),this.remove()})}}r(x,"observed",["tone","title","dismissible"]),r(x,"styles",`
+    `}render(){var a;super.render(),(a=this.$(".close"))==null||a.addEventListener("click",()=>{this.emit("dismiss"),this.remove()})}}t(x,"observed",["tone","title","dismissible"]),t(x,"styles",`
     :host { display: block; }
     .alert {
       --_c: var(--ga-muted, #878787);
@@ -363,7 +363,7 @@ var _=Object.defineProperty;var $=(t,a,e)=>a in t?_(t,a,{enumerable:!0,configura
       transition: color var(--ga-transition, 0.18s ease);
     }
     .close:hover { color: var(--ga-fg, #ededed); }
-  `);n("ga-alert",x);class w extends i{template(){return'<kbd part="kbd"><slot></slot></kbd>'}}r(w,"styles",`
+  `);n("ga-alert",x);class k extends i{template(){return'<kbd part="kbd"><slot></slot></kbd>'}}t(k,"styles",`
     :host { display: inline-block; }
     kbd {
       display: inline-block;
@@ -379,17 +379,17 @@ var _=Object.defineProperty;var $=(t,a,e)=>a in t?_(t,a,{enumerable:!0,configura
       min-width: 1em;
       text-align: center;
     }
-  `);n("ga-kbd",w);class m extends i{_parse(){try{return JSON.parse(this.attr("tabs","[]"))}catch{return[]}}template(){var c;const a=this._parse(),e=this.attr("active")||((c=a[0])==null?void 0:c.id),s=a.map(l=>`
-      <button class="tab" part="tab" role="tab" data-id="${o(l.id)}"
-        aria-selected="${l.id===e}" tabindex="${l.id===e?"0":"-1"}">
-        ${o(l.label)}
-      </button>`).join(""),d=a.map(l=>`
-      <div role="tabpanel" ${l.id===e?"":"hidden"}>
-        <slot name="${o(l.id)}"></slot>
+  `);n("ga-kbd",k);class m extends i{_parse(){try{return JSON.parse(this.attr("tabs","[]"))}catch{return[]}}template(){var c;const a=this._parse(),e=this.attr("active")||((c=a[0])==null?void 0:c.id),s=a.map(d=>`
+      <button class="tab" part="tab" role="tab" data-id="${o(d.id)}"
+        aria-selected="${d.id===e}" tabindex="${d.id===e?"0":"-1"}">
+        ${o(d.label)}
+      </button>`).join(""),l=a.map(d=>`
+      <div role="tabpanel" ${d.id===e?"":"hidden"}>
+        <slot name="${o(d.id)}"></slot>
       </div>`).join("");return`
       <div class="list" part="list" role="tablist">${s}</div>
-      <div class="panels" part="panels">${d}</div>
-    `}render(){super.render(),this.shadowRoot.querySelectorAll(".tab").forEach(a=>{a.addEventListener("click",()=>this._select(a.dataset.id))})}_select(a){a!==this.attr("active")&&(this.setAttribute("active",a),this.emit("change",{id:a}))}}r(m,"observed",["tabs","active"]),r(m,"styles",`
+      <div class="panels" part="panels">${l}</div>
+    `}render(){super.render(),this.shadowRoot.querySelectorAll(".tab").forEach(a=>{a.addEventListener("click",()=>this._select(a.dataset.id))})}_select(a){a!==this.attr("active")&&(this.setAttribute("active",a),this.emit("change",{id:a}))}}t(m,"observed",["tabs","active"]),t(m,"styles",`
     :host { display: block; }
     .list {
       display: flex;
@@ -424,4 +424,4 @@ var _=Object.defineProperty;var $=(t,a,e)=>a in t?_(t,a,{enumerable:!0,configura
       border-radius: var(--ga-radius, 6px);
     }
     .panels { padding-top: var(--ga-space-4, 16px); }
-  `);n("ga-tabs",m);const E={parameters:{backgrounds:{default:"black",values:[{name:"black",value:"#000000"},{name:"elevated",value:"#1a1a1a"},{name:"light",value:"#ffffff"}]},controls:{matchers:{color:/(background|color)$/i,date:/Date$/i}},options:{storySort:{order:["Introduction","Foundations","Components"]}}},globalTypes:{theme:{description:"Color theme",defaultValue:"dark",toolbar:{title:"Theme",icon:"circlehollow",items:[{value:"dark",title:"Dark"},{value:"light",title:"Light"}],dynamicTitle:!0}}},decorators:[(t,a)=>(document.documentElement.setAttribute("data-theme",a.globals.theme),t())]};export{E as default};
+  `);n("ga-tabs",m);const z={parameters:{backgrounds:{default:"black",values:[{name:"black",value:"#000000"},{name:"elevated",value:"#1a1a1a"},{name:"light",value:"#ffffff"}]},controls:{matchers:{color:/(background|color)$/i,date:/Date$/i}},options:{storySort:{order:["Introduction","Foundations","Components"]}}},globalTypes:{theme:{description:"Color theme",defaultValue:"dark",toolbar:{title:"Theme",icon:"circlehollow",items:[{value:"dark",title:"Dark"},{value:"light",title:"Light"}],dynamicTitle:!0}}},decorators:[(r,a)=>(document.documentElement.setAttribute("data-theme",a.globals.theme),r())]};export{z as default};
