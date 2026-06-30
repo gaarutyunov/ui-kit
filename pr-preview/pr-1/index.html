@@ -1,173 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-
-    <title>@storybook/core - Storybook</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-
-    
-    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
-    
-    <style>
-      @font-face {
-        font-family: 'Nunito Sans';
-        font-style: normal;
-        font-weight: 400;
-        font-display: swap;
-        src: url('./sb-common-assets/nunito-sans-regular.woff2') format('woff2');
-      }
-
-      @font-face {
-        font-family: 'Nunito Sans';
-        font-style: italic;
-        font-weight: 400;
-        font-display: swap;
-        src: url('./sb-common-assets/nunito-sans-italic.woff2') format('woff2');
-      }
-
-      @font-face {
-        font-family: 'Nunito Sans';
-        font-style: normal;
-        font-weight: 700;
-        font-display: swap;
-        src: url('./sb-common-assets/nunito-sans-bold.woff2') format('woff2');
-      }
-
-      @font-face {
-        font-family: 'Nunito Sans';
-        font-style: italic;
-        font-weight: 700;
-        font-display: swap;
-        src: url('./sb-common-assets/nunito-sans-bold-italic.woff2') format('woff2');
-      }
-    </style>
-
-    <link href="./sb-manager/runtime.js" rel="modulepreload" />
-
-    
-    <link href="./sb-addons/storybook-core-core-server-presets-0/common-manager-bundle.js" rel="modulepreload" />
-    
-    <link href="./sb-addons/essentials-controls-1/manager-bundle.js" rel="modulepreload" />
-    
-    <link href="./sb-addons/essentials-actions-2/manager-bundle.js" rel="modulepreload" />
-    
-    <link href="./sb-addons/essentials-docs-3/manager-bundle.js" rel="modulepreload" />
-    
-    <link href="./sb-addons/essentials-backgrounds-4/manager-bundle.js" rel="modulepreload" />
-    
-    <link href="./sb-addons/essentials-viewport-5/manager-bundle.js" rel="modulepreload" />
-    
-    <link href="./sb-addons/essentials-toolbars-6/manager-bundle.js" rel="modulepreload" />
-    
-    <link href="./sb-addons/essentials-measure-7/manager-bundle.js" rel="modulepreload" />
-    
-    <link href="./sb-addons/essentials-outline-8/manager-bundle.js" rel="modulepreload" />
-    
-    <link href="./sb-addons/a11y-9/manager-bundle.js" rel="modulepreload" />
-       
-
-    <style>
-      #storybook-root[hidden] {
-        display: none !important;
-      }
-    </style>
-
-    
-  </head>
-  <body>
-    <div id="root"></div>
-
-    
-    <script>
-      
-        
-          window['FEATURES'] = {
-  "argTypeTargetsV7": true,
-  "legacyDecoratorFileOrder": false,
-  "disallowImplicitActionsInRenderV8": true
-};
-        
-      
-        
-          window['REFS'] = {};
-        
-      
-        
-          window['LOGLEVEL'] = "info";
-        
-      
-        
-          window['DOCS_OPTIONS'] = {
-  "defaultName": "Docs",
-  "autodocs": "tag"
-};
-        
-      
-        
-          window['CONFIG_TYPE'] = "PRODUCTION";
-        
-      
-        
-      
-        
-      
-        
-          window['TAGS_OPTIONS'] = {
-  "dev-only": {
-    "excludeFromDocsStories": true
-  },
-  "docs-only": {
-    "excludeFromSidebar": true
-  },
-  "test-only": {
-    "excludeFromSidebar": true,
-    "excludeFromDocsStories": true
-  }
-};
-        
-      
-        
-          window['STORYBOOK_RENDERER'] = "web-components";
-        
-      
-        
-          window['STORYBOOK_BUILDER'] = "@storybook/builder-vite";
-        
-      
-        
-          window['STORYBOOK_FRAMEWORK'] = "@storybook/web-components-vite";
-        
-      
-    </script>
-    
-
-    <script type="module">
-      import './sb-manager/globals-runtime.js';
-      
-      
-        import './sb-addons/storybook-core-core-server-presets-0/common-manager-bundle.js';
-      
-        import './sb-addons/essentials-controls-1/manager-bundle.js';
-      
-        import './sb-addons/essentials-actions-2/manager-bundle.js';
-      
-        import './sb-addons/essentials-docs-3/manager-bundle.js';
-      
-        import './sb-addons/essentials-backgrounds-4/manager-bundle.js';
-      
-        import './sb-addons/essentials-viewport-5/manager-bundle.js';
-      
-        import './sb-addons/essentials-toolbars-6/manager-bundle.js';
-      
-        import './sb-addons/essentials-measure-7/manager-bundle.js';
-      
-        import './sb-addons/essentials-outline-8/manager-bundle.js';
-      
-        import './sb-addons/a11y-9/manager-bundle.js';
-      
-      
-      import './sb-manager/runtime.js';
-    </script>
-  </body>
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>GA UI Kit</title>
+  <meta name="description" content="A universal, zero-dependency Web Components UI kit — documented with a site built from its own components." />
+  <link rel="icon" href="data:," />
+  <!-- Design tokens (global theme). Relative paths => works at any deploy base. -->
+  <link rel="stylesheet" href="./src/tokens/tokens.css" />
+  <link rel="stylesheet" href="./site/app.css" />
+</head>
+<body class="ga-theme">
+  <div id="app" aria-busy="true"></div>
+  <script type="module" src="./site/app.js"></script>
+  <noscript style="display:block;padding:40px;font-family:sans-serif">
+    This docs site needs JavaScript. The components themselves are plain custom
+    elements and work without it.
+  </noscript>
+</body>
 </html>
