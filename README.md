@@ -35,7 +35,8 @@ the same kit drops into any stack with no framework-specific adapter:
 
 `ga-button` · `ga-badge` · `ga-card` · `ga-avatar` · `ga-input` · `ga-switch`
 · `ga-spinner` · `ga-alert` · `ga-kbd` · `ga-tabs` · `ga-note` · `ga-slider`
-· `ga-file-drop` · `ga-fab` · `ga-panel` · `ga-header`
+· `ga-file-drop` · `ga-fab` · `ga-panel` · `ga-header` · `ga-bottom-nav`
+· `ga-bottom-sheet`
 
 Cards and pills follow the
 [garutyunov.com](https://github.com/gaarutyunov/garutyunov.com) styling; the
