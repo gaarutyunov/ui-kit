@@ -1,4 +1,5 @@
 import { GaElement, define, esc } from "../../core/base-element.js";
+import "../icon/icon.js";
 
 /**
  * `<ga-file-drop>` — a drag-and-drop file upload area.
@@ -39,7 +40,7 @@ export class GaFileDrop extends GaElement {
       color: var(--ga-fg, #ededed);
       background: color-mix(in srgb, var(--ga-accent, #54a2ff) 8%, transparent);
     }
-    .icon { font-size: 22px; line-height: 1; opacity: 0.85; }
+    .icon { opacity: 0.85; }
     .label { font-size: var(--ga-fs-sm, 14px); }
     .hint { font-size: var(--ga-fs-xs, 12px); color: var(--ga-dim, #454545); }
     .hint:empty { display: none; }
@@ -50,7 +51,7 @@ export class GaFileDrop extends GaElement {
     const label = this.attr("label", "Drop files here or click to browse");
     return /* html */ `
       <label class="drop" part="drop">
-        <span class="icon" aria-hidden="true">⤓</span>
+        <ga-icon class="icon" name="upload" size="24"></ga-icon>
         <span class="label">${esc(label)}</span>
         <span class="hint"><slot></slot></span>
         <input type="file" ${this.hasFlag("multiple") ? "multiple" : ""} accept="${esc(this.attr("accept"))}" />

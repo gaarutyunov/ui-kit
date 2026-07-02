@@ -158,6 +158,13 @@ td:last-child { color: var(--ga-muted); }
 .swatch-name { font-size: 13px; }
 .swatch-var { font-family: var(--ga-font-mono); font-size: 11px; color: var(--ga-muted); }
 .type-scale { display: flex; flex-direction: column; gap: 18px; }
+.iconset { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; margin-top: 16px; }
+.iconcell {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  padding: 18px 8px; border: 1px solid var(--ga-border); border-radius: var(--ga-radius);
+  color: var(--ga-fg);
+}
+.iconcell code { font-size: 11px; color: var(--ga-muted); }
 
 /* ---- mobile drawer ------------------------------------------------------ */
 .scrim { display: none; position: fixed; inset: 56px 0 0; background: rgba(0,0,0,0.5); z-index: 20; }
