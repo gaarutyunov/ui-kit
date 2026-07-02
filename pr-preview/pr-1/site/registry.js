@@ -42,6 +42,8 @@ export const NAV = [
       { id: "fab", label: "FAB" },
       { id: "panel", label: "Panel" },
       { id: "header", label: "Header" },
+      { id: "bottom-nav", label: "Bottom nav" },
+      { id: "bottom-sheet", label: "Bottom sheet" },
     ],
   },
 ];
@@ -500,6 +502,56 @@ export const COMPONENTS = {
     slots: [
       { name: "brand", desc: "Custom brand content (overrides the brand attribute)." },
       { name: "(default)", desc: "Right-aligned nav actions (links, buttons)." },
+    ],
+  },
+
+  "bottom-nav": {
+    title: "Bottom nav",
+    tag: "ga-bottom-nav",
+    lead: "A mobile-app bottom navigation bar — icon + label destinations, one active at a time. Fixed to the screen bottom (shown inline here via static).",
+    examples: [
+      { title: "Default", code: `<ga-bottom-nav static active="explore"
+  items='[
+    {"id":"explore","label":"Explore","icon":"🧭"},
+    {"id":"saved","label":"Saved","icon":"★"},
+    {"id":"contribute","label":"Contribute","icon":"＋"},
+    {"id":"updates","label":"Updates","icon":"🔔"},
+    {"id":"you","label":"You","icon":"◍"}
+  ]'>
+</ga-bottom-nav>` },
+    ],
+    api: [
+      { name: "items", type: "JSON: { id, label, icon }[]", def: "[]", desc: "Destinations; icon is any glyph." },
+      { name: "active", type: "string", def: "first", desc: "Active item id (reflected)." },
+      { name: "static", type: "boolean", def: "false", desc: "Render inline instead of fixed (for embedding)." },
+    ],
+    events: [{ name: "change", desc: "Fires on tap. detail: { id }." }],
+  },
+
+  "bottom-sheet": {
+    title: "Bottom sheet",
+    tag: "ga-bottom-sheet",
+    lead: "A draggable sheet that rises from the bottom with snap points — like Google Maps. Drag the handle between peek / half / full, or drag down to dismiss.",
+    examples: [
+      { title: "Draggable sheet", code: `<ga-button variant="primary" onclick="this.nextElementSibling.show('half')">Open bottom sheet</ga-button>
+<ga-bottom-sheet snap="half">
+  <div slot="header"><strong>Nearby places</strong></div>
+  <p style="margin:0 0 14px;">Drag the grab handle up for full height, down to peek — or drag past peek to dismiss.</p>
+  <ga-slider label="Search radius" value="50"></ga-slider>
+</ga-bottom-sheet>` },
+    ],
+    api: [
+      { name: "open", type: "boolean", def: "false", desc: "Reflected visibility." },
+      { name: "snap", type: `"peek" | "half" | "full"`, def: "half", desc: "Current detent (reflected)." },
+    ],
+    events: [
+      { name: "open", desc: "Fires when shown." },
+      { name: "close", desc: "Fires when dismissed." },
+      { name: "snapchange", desc: "Fires on detent change. detail: { snap }." },
+    ],
+    slots: [
+      { name: "header", desc: "Fixed header under the grab handle." },
+      { name: "(default)", desc: "Scrollable body." },
     ],
   },
 };
