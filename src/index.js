@@ -32,6 +32,7 @@ import "./components/slider/slider.js";
 import "./components/header/header.js";
 import "./components/bottom-sheet/bottom-sheet.js";
 import "./components/bottom-nav/bottom-nav.js";
+import "./components/icon/icon.js";
 
 export { GaButton } from "./components/button/button.js";
 export { GaBadge } from "./components/badge/badge.js";
@@ -51,3 +52,4 @@ export { GaSlider } from "./components/slider/slider.js";
 export { GaHeader } from "./components/header/header.js";
 export { GaBottomSheet } from "./components/bottom-sheet/bottom-sheet.js";
 export { GaBottomNav } from "./components/bottom-nav/bottom-nav.js";
+export { GaIcon } from "./components/icon/icon.js";

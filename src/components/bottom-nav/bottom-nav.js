@@ -1,4 +1,5 @@
 import { GaElement, define, esc } from "../../core/base-element.js";
+import "../icon/icon.js";
 
 /**
  * `<ga-bottom-nav>` — a mobile-app bottom navigation bar.
@@ -57,12 +58,19 @@ export class GaBottomNav extends GaElement {
   template() {
     const items = this._parse();
     const active = this.attr("active") || items[0]?.id;
-    const buttons = items.map((it) => `
+    const buttons = items.map((it) => {
+      const icon = it.icon || "";
+      // A bare name (e.g. "compass") renders a ga-icon; any other glyph is text.
+      const iconHtml = /^[a-z][a-z0-9-]*$/.test(icon)
+        ? `<ga-icon class="icon" name="${esc(icon)}" size="22"></ga-icon>`
+        : `<span class="icon" aria-hidden="true">${esc(icon || "•")}</span>`;
+      return `
       <button class="item" part="item" data-id="${esc(it.id)}"
         ${it.id === active ? 'aria-current="page"' : ""}>
-        <span class="icon" aria-hidden="true">${esc(it.icon || "•")}</span>
+        ${iconHtml}
         <span class="label">${esc(it.label)}</span>
-      </button>`).join("");
+      </button>`;
+    }).join("");
     return /* html */ `<nav class="nav" part="nav" role="navigation">${buttons}</nav>`;
   }
 

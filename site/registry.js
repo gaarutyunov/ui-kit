@@ -21,6 +21,7 @@ export const NAV = [
     items: [
       { id: "colors", label: "Colors" },
       { id: "typography", label: "Typography" },
+      { id: "icons", label: "Icons" },
     ],
   },
   {
@@ -442,9 +443,9 @@ export const COMPONENTS = {
     tag: "ga-fab",
     lead: "A floating action button — ported from stereoscope's curtain toggle. Fixed bottom-right by default; shown inline here via position=\"static\".",
     examples: [
-      { title: "Colors", code: `<ga-fab position="static" label="Add">+</ga-fab>
-<ga-fab position="static" color="green" label="Confirm">✓</ga-fab>
-<ga-fab position="static" color="red" label="Delete">×</ga-fab>` },
+      { title: "Colors", code: `<ga-fab position="static" label="Add"><ga-icon name="plus" size="24"></ga-icon></ga-fab>
+<ga-fab position="static" color="green" label="Confirm"><ga-icon name="check" size="24"></ga-icon></ga-fab>
+<ga-fab position="static" color="red" label="Delete"><ga-icon name="trash" size="22"></ga-icon></ga-fab>` },
     ],
     api: [
       { name: "color", type: `"" | "green" | "amber" | "purple" | "red"`, def: "accent", desc: "Background color." },
@@ -512,11 +513,11 @@ export const COMPONENTS = {
     examples: [
       { title: "Default", code: `<ga-bottom-nav static active="explore"
   items='[
-    {"id":"explore","label":"Explore","icon":"🧭"},
-    {"id":"saved","label":"Saved","icon":"★"},
-    {"id":"contribute","label":"Contribute","icon":"＋"},
-    {"id":"updates","label":"Updates","icon":"🔔"},
-    {"id":"you","label":"You","icon":"◍"}
+    {"id":"explore","label":"Explore","icon":"compass"},
+    {"id":"saved","label":"Saved","icon":"bookmark"},
+    {"id":"contribute","label":"Contribute","icon":"plus"},
+    {"id":"updates","label":"Updates","icon":"bell"},
+    {"id":"you","label":"You","icon":"user"}
   ]'>
 </ga-bottom-nav>` },
     ],

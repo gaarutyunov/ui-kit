@@ -9,6 +9,7 @@
 
 import "../src/index.js"; // registers every <ga-*> element
 import { NAV, DOCS, COMPONENTS, PALETTE } from "./registry.js";
+import { ICON_NAMES } from "../src/core/icons.js";
 
 const GITHUB = "https://github.com/gaarutyunov/ui-kit";
 
@@ -254,6 +255,22 @@ function renderColors() {
   return frag;
 }
 
+function renderIcons() {
+  const frag = document.createDocumentFragment();
+  frag.append(el("h1", {}, "Icons"),
+    el("p", { class: "lead" }, "Simple line icons that stroke with currentColor via <ga-icon name=\"…\">. Used by the bottom nav, FAB and file drop."));
+  frag.append(el("div", { class: "prose" }, (() => { const d = el("div"); d.innerHTML = `<pre class="code"><code>&lt;ga-icon name="compass"&gt;&lt;/ga-icon&gt;
+&lt;ga-icon name="star" size="28"&gt;&lt;/ga-icon&gt;</code></pre>`; return d; })()));
+  const grid = el("div", { class: "iconset" });
+  for (const name of ICON_NAMES) {
+    grid.append(el("div", { class: "iconcell" },
+      el("ga-icon", { name, size: "24" }),
+      el("code", {}, name)));
+  }
+  frag.append(grid);
+  return frag;
+}
+
 function renderTypography() {
   const frag = document.createDocumentFragment();
   frag.append(el("h1", {}, "Typography"),
@@ -277,6 +294,7 @@ function escapeHtml(s) {
 function titleOf(id) {
   if (id === "colors") return "Colors";
   if (id === "typography") return "Typography";
+  if (id === "icons") return "Icons";
   return allPages()[id]?.title || "GA UI Kit";
 }
 function groupOf(id) {
@@ -307,6 +325,7 @@ function route() {
   page.innerHTML = "";
   let content;
   if (id === "colors") content = renderColors();
+  else if (id === "icons") content = renderIcons();
   else if (id === "typography") content = renderTypography();
   else if (COMPONENTS[id]) content = renderComponent(COMPONENTS[id]);
   else if (DOCS[id]) content = renderDoc(DOCS[id], id);
