@@ -1,42 +1,20 @@
 /* =========================================================================
-   GA UI Kit — universal Web Components.
+   Public type entry for `@gaarutyunov/ui-kit`.
 
-   Importing this module registers every custom element (`ga-*`) as a side
-   effect. Works in any framework or none:
+   Re-exports every component class and pulls in the ambient DOM augmentation
+   (`HTMLElementTagNameMap`) so `import "@gaarutyunov/ui-kit"` gives vanilla /
+   Vue / Svelte / Solid users typed `document.querySelector("ga-card")` etc.
 
-     import "@gaarutyunov/ui-kit";              // register all components
-     import "@gaarutyunov/ui-kit/tokens.css";   // optional global theme
+   React's JSX is intentionally NOT augmented here — see the separate, opt-in
+   `@gaarutyunov/ui-kit/react` entry.
 
-   Or cherry-pick a single component:
-
-     import "@gaarutyunov/ui-kit/components/button/button.js";
+   The per-component `.d.ts` files are generated from the JSDoc via
+   `npm run types` (tsc --allowJs --declaration --emitDeclarationOnly).
    ========================================================================= */
 
-export { GaElement, define, esc } from "./core/base-element.js";
+/// <reference path="./global.d.ts" />
 
-import "./components/button/button.js";
-import "./components/radio-group/radio-group.js";
-import "./components/code/code.js";
-import "./components/breadcrumbs/breadcrumbs.js";
-import "./components/table/table.js";
-import "./components/badge/badge.js";
-import "./components/card/card.js";
-import "./components/avatar/avatar.js";
-import "./components/input/input.js";
-import "./components/switch/switch.js";
-import "./components/spinner/spinner.js";
-import "./components/alert/alert.js";
-import "./components/kbd/kbd.js";
-import "./components/tabs/tabs.js";
-import "./components/note/note.js";
-import "./components/file-drop/file-drop.js";
-import "./components/fab/fab.js";
-import "./components/panel/panel.js";
-import "./components/slider/slider.js";
-import "./components/header/header.js";
-import "./components/bottom-sheet/bottom-sheet.js";
-import "./components/bottom-nav/bottom-nav.js";
-import "./components/icon/icon.js";
+export { GaElement, define, esc } from "./core/base-element.js";
 
 export { GaButton } from "./components/button/button.js";
 export { GaRadioGroup } from "./components/radio-group/radio-group.js";

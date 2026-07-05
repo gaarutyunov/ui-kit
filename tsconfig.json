@@ -1,0 +1,19 @@
+{
+  "//": "Type-declaration generation only. The kit ships as buildless ES modules; this config just emits .d.ts next to each component from its JSDoc. Run with `npm run types`.",
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "allowJs": true,
+    "checkJs": false,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "rootDir": "src",
+    "outDir": "src"
+  },
+  "include": ["src/**/*.js"],
+  "exclude": ["src/index.js", "src/react.js", "node_modules", "dist"]
+}

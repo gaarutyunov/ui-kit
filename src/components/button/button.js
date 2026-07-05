@@ -4,17 +4,26 @@ import { GaElement, define, esc } from "../../core/base-element.js";
  * `<ga-button>` — the kit's primary action element.
  *
  * Attributes:
- *   variant   "primary" | "secondary" | "ghost" | "danger"  (default secondary)
- *   size      "sm" | "md" | "lg"                              (default md)
- *   href      render as a link instead of a button
- *   disabled  boolean
- *   loading   boolean — shows a spinner and blocks clicks
- *   block     boolean — full width
+ *   variant     "primary" | "secondary" | "ghost" | "danger"  (default secondary)
+ *   size        "sm" | "md" | "lg"                              (default md)
+ *   href        render as a link instead of a button
+ *   download    (link) filename hint / force-download           — forwarded to <a>
+ *   target      (link) "_blank" | "_self" | …                   — forwarded to <a>
+ *   rel         (link) e.g. "noopener noreferrer"               — forwarded to <a>
+ *   type        (button) "button" | "submit" | "reset"          — forwarded to <button>
+ *   name        (button) form control name                      — forwarded to <button>
+ *   aria-label  accessible label                                — forwarded to <a>/<button>
+ *   disabled    boolean
+ *   loading     boolean — shows a spinner and blocks clicks
+ *   block       boolean — full width
  *
  * Slots: default (label), `start` / `end` (icons).
  */
 export class GaButton extends GaElement {
-  static observed = ["variant", "size", "href", "disabled", "loading", "block"];
+  static observed = [
+    "variant", "size", "href", "download", "target", "rel",
+    "type", "name", "aria-label", "disabled", "loading", "block",
+  ];
 
   static styles = /* css */ `
     :host { display: inline-block; }
@@ -116,12 +125,28 @@ export class GaButton extends GaElement {
     }
   };
 
+  /** Forward `name` from the host as attribute `out` on the inner element. */
+  _pass(name, out = name) {
+    return this.hasAttribute(name)
+      ? ` ${out}="${esc(this.getAttribute(name))}"`
+      : "";
+  }
+
   template() {
     const href = this.attr("href");
     const tag = href ? "a" : "button";
+    // aria-label is forwarded to whichever inner element we render.
+    const aria = this._pass("aria-label");
     const attrs = href
-      ? `href="${esc(href)}"`
-      : `type="button"${this.hasFlag("disabled") ? " disabled" : ""}`;
+      ? `href="${esc(href)}"` +
+        this._pass("download") +
+        this._pass("target") +
+        this._pass("rel") +
+        aria
+      : `type="${esc(this.attr("type", "button"))}"` +
+        this._pass("name") +
+        aria +
+        (this.hasFlag("disabled") ? " disabled" : "");
     const spinner = this.hasFlag("loading") ? `<span class="spinner" aria-hidden="true"></span>` : "";
     return /* html */ `
       <${tag} class="btn" part="button" ${attrs}>

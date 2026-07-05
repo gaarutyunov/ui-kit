@@ -23,10 +23,23 @@
   ],
   "main": "src/index.js",
   "module": "src/index.js",
+  "types": "./src/index.d.ts",
   "exports": {
-    ".": "./src/index.js",
-    "./tokens.css": "./src/tokens/tokens.css",
-    "./components/*": "./src/components/*"
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./react": {
+      "types": "./src/react.d.ts",
+      "default": "./src/react.js"
+    },
+    "./tokens.css": {
+      "default": "./src/tokens/tokens.css"
+    },
+    "./components/*": {
+      "types": "./src/components/*",
+      "default": "./src/components/*"
+    }
   },
   "files": [
     "src"
@@ -42,6 +55,10 @@
   "scripts": {
     "dev": "node scripts/serve.mjs",
     "build": "node scripts/build.mjs",
-    "bundle": "node scripts/bundle.mjs"
+    "bundle": "node scripts/bundle.mjs",
+    "types": "node scripts/types.mjs"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3"
   }
 }
