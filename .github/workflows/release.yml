@@ -1,0 +1,60 @@
+name: Release
+
+# Publish on every GitHub Release (or manual dispatch):
+#   1. the npm package -> GitHub Packages (ESM, for bundler / framework users)
+#   2. standalone bundles -> attached to the Release (for drop-in <script> use)
+#
+# Create a Release named vX.Y.Z (or run this workflow manually with a version)
+# to trigger it. The package version is taken from the tag/input.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to publish, e.g. 0.1.0"
+        required: true
+
+permissions:
+  contents: write # upload release assets
+  packages: write # publish to GitHub Packages
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://npm.pkg.github.com
+          scope: "@gaarutyunov"
+
+      - name: Resolve version from tag / input
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            VER="${GITHUB_REF_NAME#v}"
+          else
+            VER="${{ github.event.inputs.version }}"
+          fi
+          echo "Publishing version $VER"
+          npm version "$VER" --no-git-tag-version --allow-same-version
+
+      - name: Build standalone bundles
+        run: npm run bundle
+
+      - name: Publish package to GitHub Packages
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Attach standalone bundles to the Release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/ga-ui-kit.min.js
+            dist/ga-ui-kit.esm.js
+            dist/ga-ui-kit.css
