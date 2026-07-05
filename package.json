@@ -31,6 +31,9 @@
   "files": [
     "src"
   ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "sideEffects": [
     "src/index.js",
     "src/components/**/*.js",
@@ -38,6 +41,7 @@
   ],
   "scripts": {
     "dev": "node scripts/serve.mjs",
-    "build": "node scripts/build.mjs"
+    "build": "node scripts/build.mjs",
+    "bundle": "node scripts/bundle.mjs"
   }
 }

@@ -45,17 +45,41 @@ note, slider, file-drop, FAB and panel are ported from
 
 ## Install
 
+### npm (GitHub Packages)
+
+The package is published to **GitHub Packages**. Point the `@gaarutyunov`
+scope at the GitHub registry (once), then install:
+
+```ini
+# .npmrc
+@gaarutyunov:registry=https://npm.pkg.github.com
+```
+
 ```bash
 npm install @gaarutyunov/ui-kit
 ```
 
-…or use it straight from a CDN with no build step (matching stereoscope's
-buildless philosophy):
+> GitHub Packages requires authentication even for public packages — add a
+> personal access token with `read:packages` to your `~/.npmrc`
+> (`//npm.pkg.github.com/:_authToken=YOUR_TOKEN`).
+
+### Standalone `<script>` (no build, no npm)
+
+Every release attaches a self-contained bundle. Drop it straight into any page
+— it registers all `<ga-*>` elements on load:
 
 ```html
-<link rel="stylesheet" href="https://esm.sh/@gaarutyunov/ui-kit/tokens.css" />
-<script type="module">import "https://esm.sh/@gaarutyunov/ui-kit";</script>
+<link rel="stylesheet"
+  href="https://github.com/gaarutyunov/ui-kit/releases/latest/download/ga-ui-kit.css" />
+<script
+  src="https://github.com/gaarutyunov/ui-kit/releases/latest/download/ga-ui-kit.min.js"></script>
+
+<ga-button variant="primary">Hello</ga-button>
 ```
+
+An ES-module build (`ga-ui-kit.esm.js`) is attached too, for
+`<script type="module">import`. Pin a version with
+`releases/download/vX.Y.Z/…` instead of `releases/latest/…`.
 
 ## Usage by framework
 
@@ -149,10 +173,26 @@ Layout:
 - `site/` — the docs site (`app.js` router/renderer, `app.css`, `registry.js`
   content), built from the `ga-*` components themselves.
 - `scripts/` — `build.mjs` (copies `index.html` + `site/` + `src/` into
-  `dist/`) and `serve.mjs` (dev server).
+  `dist/`), `serve.mjs` (dev server), and `bundle.mjs` (esbuild bundles for
+  release).
 
 To document a new component, add it to `site/registry.js` — no code changes
 needed elsewhere.
+
+Build the standalone bundles locally with `npm run bundle` (uses esbuild via
+`npx`, so nothing is added to `package.json`).
+
+## Releasing
+
+Publishing is automated by **`release.yml`**. Create a GitHub **Release** named
+`vX.Y.Z` (or run the workflow manually with a version) and it will:
+
+1. set the package version from the tag,
+2. publish the npm package to **GitHub Packages**, and
+3. build `ga-ui-kit.min.js` / `ga-ui-kit.esm.js` / `ga-ui-kit.css` and **attach
+   them to the Release** as downloadable assets.
+
+Both channels use the repo's `GITHUB_TOKEN` — no extra secrets required.
 
 ## Deployment
 
