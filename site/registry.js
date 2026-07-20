@@ -13,6 +13,7 @@ export const NAV = [
     items: [
       { id: "introduction", label: "Introduction" },
       { id: "installation", label: "Installation" },
+      { id: "typescript", label: "TypeScript" },
       { id: "theming", label: "Theming" },
     ],
   },
@@ -28,6 +29,7 @@ export const NAV = [
     title: "Components",
     items: [
       { id: "button", label: "Button" },
+      { id: "radio-group", label: "Radio group" },
       { id: "badge", label: "Badge" },
       { id: "card", label: "Card" },
       { id: "avatar", label: "Avatar" },
@@ -36,7 +38,10 @@ export const NAV = [
       { id: "spinner", label: "Spinner" },
       { id: "alert", label: "Alert" },
       { id: "kbd", label: "Kbd" },
+      { id: "code", label: "Code" },
       { id: "tabs", label: "Tabs" },
+      { id: "breadcrumbs", label: "Breadcrumbs" },
+      { id: "table", label: "Table" },
       { id: "note", label: "Note" },
       { id: "slider", label: "Slider" },
       { id: "file-drop", label: "File drop" },
@@ -100,6 +105,63 @@ import "@gaarutyunov/ui-kit/tokens.css"; // optional global theme</code></pre>
     `,
   },
 
+  typescript: {
+    title: "TypeScript",
+    lead: "First-class types for every ga-* element — generated from the same JSDoc that documents the components. No @types package to install; the declarations ship inside the kit.",
+    html: /* html */ `
+      <h2>What ships</h2>
+      <ul>
+        <li>A <code>.d.ts</code> beside every component (emitted from its JSDoc), so
+        <code>import { GaButton } from "@gaarutyunov/ui-kit"</code> is fully typed.</li>
+        <li>An ambient augmentation of <code>HTMLElementTagNameMap</code>, so
+        <code>document.querySelector("ga-card")</code> is a <code>GaCard</code> and
+        <code>createElement("ga-code")</code> is a <code>GaCode</code> — automatically,
+        for vanilla / Vue / Svelte / Solid users.</li>
+        <li>A separate, opt-in <code>@gaarutyunov/ui-kit/react</code> entry that augments
+        <code>React.JSX.IntrinsicElements</code> with every tag and its attributes.</li>
+      </ul>
+
+      <h2>DOM types (any framework)</h2>
+      <p>Just import the kit — the tag map is augmented for you:</p>
+      <pre class="code"><code>import "@gaarutyunov/ui-kit";
+
+const card = document.querySelector("ga-card"); // typed as GaCard | null
+card?.setAttribute("interactive", "");</code></pre>
+
+      <h2>React (JSX)</h2>
+      <p>React doesn't know about custom tags by default. Reference the types-only
+      React entry <strong>once</strong>, anywhere in your app — then every
+      <code>&lt;ga-*&gt;</code> element type-checks with its documented attributes.
+      Boolean attributes accept <code>"" | boolean</code>; you still get
+      <code>className</code>, <code>style</code>, <code>ref</code> and <code>on*</code>
+      handlers.</p>
+      <pre class="code"><code>// types.d.ts (or the top of any .tsx) — zero local declarations needed
+import "@gaarutyunov/ui-kit/react";</code></pre>
+      <pre class="code"><code>import "@gaarutyunov/ui-kit";        // registers the elements (runtime)
+import "@gaarutyunov/ui-kit/react";  // teaches JSX about them (types only)
+
+export function Demo() {
+  return (
+    &lt;ga-card interactive padding="lg"&gt;
+      &lt;ga-button variant="primary" href="/dl" download="report.pdf"&gt;
+        Download
+      &lt;/ga-button&gt;
+    &lt;/ga-card&gt;
+  );
+}</code></pre>
+      <p class="muted">The React entry is deliberately separate, so importing the kit
+      itself never touches React's JSX — vanilla, Vue, Svelte and Solid projects are
+      unaffected. Requires a bundler-style <code>moduleResolution</code>
+      (<code>"bundler"</code>, <code>"node16"</code> or <code>"nodenext"</code>);
+      works great with React 19.</p>
+
+      <h2>Regenerating types</h2>
+      <p>Declarations are generated from the JSDoc with the dev-only
+      <code>typescript</code> package — the kit itself stays zero-runtime-dependency:</p>
+      <pre class="code"><code>npm run types</code></pre>
+    `,
+  },
+
   theming: {
     title: "Theming",
     lead: "Re-brand the whole kit by overriding a handful of CSS variables — the same --accent / --radius pattern stereoscope uses.",
@@ -153,11 +215,19 @@ export const COMPONENTS = {
 <ga-button variant="primary" disabled>Disabled</ga-button>` },
       { title: "With icons", code: `<ga-button variant="primary"><span slot="start">→</span> Continue</ga-button>
 <ga-button variant="secondary">Download <span slot="end">↓</span></ga-button>` },
+      { title: "Link options", code: `<ga-button variant="primary" href="/report.pdf" download="report.pdf">Download PDF</ga-button>
+<ga-button variant="secondary" href="https://github.com/gaarutyunov/ui-kit" target="_blank" rel="noopener">Open repo ↗</ga-button>` },
     ],
     api: [
       { name: "variant", type: `"secondary" | "primary" | "ghost" | "danger"`, def: "secondary", desc: "Visual style." },
       { name: "size", type: `"sm" | "md" | "lg"`, def: "md", desc: "Control height." },
       { name: "href", type: "string", def: "—", desc: "Render as an anchor link." },
+      { name: "download", type: "string | boolean", def: "—", desc: "(link) Forwarded to the <a>: download the target, with an optional filename." },
+      { name: "target", type: "string", def: "—", desc: "(link) Forwarded to the <a>, e.g. \"_blank\"." },
+      { name: "rel", type: "string", def: "—", desc: "(link) Forwarded to the <a>, e.g. \"noopener\"." },
+      { name: "type", type: `"button" | "submit" | "reset"`, def: "button", desc: "(button) Forwarded to the <button>." },
+      { name: "name", type: "string", def: "—", desc: "(button) Form control name, forwarded to the <button>." },
+      { name: "aria-label", type: "string", def: "—", desc: "Accessible label, forwarded to the inner <a>/<button>." },
       { name: "disabled", type: "boolean", def: "false", desc: "Disable interaction." },
       { name: "loading", type: "boolean", def: "false", desc: "Show a spinner and block clicks." },
       { name: "block", type: "boolean", def: "false", desc: "Full-width." },
@@ -167,6 +237,28 @@ export const COMPONENTS = {
       { name: "start", desc: "Leading icon." },
       { name: "end", desc: "Trailing icon." },
     ],
+  },
+
+  "radio-group": {
+    title: "Radio group",
+    tag: "ga-radio-group",
+    lead: "A single-select control in the segmented-pill style (not circular radio dots). Configure with an items JSON attribute; the selected id is the reflected value. Form-associated, with roving-tabindex arrow-key navigation.",
+    examples: [
+      { title: "Buttons (emits change)", code: `<ga-radio-group value="ai"
+  items='[{"id":"human","label":"Human"},{"id":"ai","label":"AI"}]'>
+</ga-radio-group>` },
+      { title: "Three options", code: `<ga-radio-group value="month"
+  items='[{"id":"day","label":"Day"},{"id":"week","label":"Week"},{"id":"month","label":"Month"}]'>
+</ga-radio-group>` },
+      { title: "Links (navigation)", code: `<ga-radio-group value="human"
+  items='[{"id":"human","label":"Human","href":"#/typescript"},{"id":"ai","label":"AI","href":"#/installation"}]'>
+</ga-radio-group>` },
+    ],
+    api: [
+      { name: "items", type: "JSON: { id, label, href? }[]", def: "[]", desc: "Options. An item with href renders as an anchor (navigation); without href it's a selectable button." },
+      { name: "value", type: "string", def: "first", desc: "Selected item id (reflected). Also the .value property." },
+    ],
+    events: [{ name: "change", desc: "Fires when a button item is chosen. detail: { value }." }],
   },
 
   badge: {
@@ -352,6 +444,25 @@ export const COMPONENTS = {
     slots: [{ name: "(default)", desc: "Key label." }],
   },
 
+  code: {
+    title: "Code",
+    tag: "ga-code",
+    lead: "A copyable code / command block. Copies to the clipboard by default (with a check-mark confirmation); set href to render it as a link with a trailing ↗ instead. Monospace on an elevated surface.",
+    examples: [
+      { title: "Copyable command", code: `<ga-code prompt="$">npm install @gaarutyunov/ui-kit</ga-code>` },
+      { title: "Plain snippet", code: `<ga-code>import "@gaarutyunov/ui-kit";</ga-code>` },
+      { title: "As a link", code: `<ga-code href="https://github.com/gaarutyunov/ui-kit" target="_blank" rel="noopener">github.com/gaarutyunov/ui-kit</ga-code>` },
+    ],
+    api: [
+      { name: "prompt", type: "string", def: "—", desc: "Optional leading glyph, e.g. \"$\"." },
+      { name: "href", type: "string", def: "—", desc: "Render as an external link (↗) instead of a copy button." },
+      { name: "target", type: "string", def: "—", desc: "(link) Forwarded to the anchor." },
+      { name: "rel", type: "string", def: "—", desc: "(link) Forwarded to the anchor." },
+    ],
+    events: [{ name: "copy", desc: "Fires after copying. detail: { text }." }],
+    slots: [{ name: "(default)", desc: "The code / command text." }],
+  },
+
   tabs: {
     title: "Tabs",
     tag: "ga-tabs",
@@ -369,6 +480,49 @@ export const COMPONENTS = {
       { name: "active", type: "string", def: "first", desc: "Active tab id (reflected)." },
     ],
     events: [{ name: "change", desc: "Fires on tab switch. detail: { id }." }],
+  },
+
+  breadcrumbs: {
+    title: "Breadcrumbs",
+    tag: "ga-breadcrumbs",
+    lead: "A monospace breadcrumb trail. Configure with an items JSON attribute; the last item is the current page (foreground, no link), earlier items are muted links separated by \"/\".",
+    examples: [
+      { title: "Trail", code: `<ga-breadcrumbs items='[
+  {"label":"Home","href":"#/introduction"},
+  {"label":"Components","href":"#/button"},
+  {"label":"Breadcrumbs"}
+]'></ga-breadcrumbs>` },
+    ],
+    api: [
+      { name: "items", type: "JSON: { label, href? }[]", def: "[]", desc: "Trail entries. The last is the current page; earlier ones link if they have an href." },
+    ],
+  },
+
+  table: {
+    title: "Table",
+    tag: "ga-table",
+    lead: "A data table with a shared column grid. Declare columns once with a columns JSON attribute; rows are slotted light-DOM elements (a div — or an <a href> for a whole-row link) with one child per column, so rich cells stay possible.",
+    examples: [
+      { title: "Skills leaderboard", code: `<ga-table columns='[
+  {"label":"#","width":"44px","align":"right","mono":true},
+  {"label":"Skill"},
+  {"label":"Score","width":"96px","align":"right","mono":true}
+]'>
+  <a href="#/table"><span>1</span><div><strong>TypeScript</strong><div style="color:var(--ga-muted);font-size:13px">Static types</div></div><span>982</span></a>
+  <a href="#/table"><span>2</span><div><strong>Web Components</strong><div style="color:var(--ga-muted);font-size:13px">Custom elements</div></div><span>948</span></a>
+  <a href="#/table"><span>3</span><div><strong>CSS</strong><div style="color:var(--ga-muted);font-size:13px">Shadow DOM</div></div><span>911</span></a>
+</ga-table>` },
+      { title: "Plain rows (div)", code: `<ga-table columns='[{"label":"Token"},{"label":"Value","align":"right","mono":true}]'>
+  <div><span>--ga-accent</span><span>#54a2ff</span></div>
+  <div><span>--ga-radius</span><span>6px</span></div>
+</ga-table>` },
+    ],
+    api: [
+      { name: "columns", type: "JSON: { label, align?, width?, mono? }[]", def: "[]", desc: "Column defs. align \"left\"|\"center\"|\"right\"; width is any grid track size; mono renders that column's cells monospace + tabular." },
+    ],
+    slots: [
+      { name: "(default)", desc: "Row elements — a <div> or <a href> per row, each with one child element per column." },
+    ],
   },
 
   note: {
