@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>GA UI Kit</title>
+  <meta name="description" content="A universal, zero-dependency Web Components UI kit — documented with a site built from its own components." />
+  <!-- Icons live under site/ so the buildless copy step (index.html, site, src) ships them; relative paths work at any deploy base. -->
+  <link rel="icon" type="image/png" sizes="32x32" href="./site/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="./site/icon-192.png" />
+  <link rel="apple-touch-icon" href="./site/apple-touch-icon.png" />
+  <meta property="og:title" content="GA UI Kit" />
+  <meta property="og:description" content="A universal, zero-dependency Web Components UI kit — documented with a site built from its own components." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="./site/icon-512.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <!-- Design tokens (global theme). Relative paths => works at any deploy base. -->
+  <link rel="stylesheet" href="./src/tokens/tokens.css" />
+  <link rel="stylesheet" href="./site/app.css" />
+</head>
+<body class="ga-theme">
+  <div id="app" aria-busy="true"></div>
+  <script type="module" src="./site/app.js"></script>
+  <noscript style="display:block;padding:40px;font-family:sans-serif">
+    This docs site needs JavaScript. The components themselves are plain custom
+    elements and work without it.
+  </noscript>
+</body>
+</html>
