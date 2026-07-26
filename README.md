@@ -37,7 +37,8 @@ the same kit drops into any stack with no framework-specific adapter:
 `ga-input` · `ga-switch` · `ga-spinner` · `ga-alert` · `ga-kbd` · `ga-code` ·
 `ga-tabs` · `ga-breadcrumbs` · `ga-table` · `ga-note` · `ga-slider` ·
 `ga-file-drop` · `ga-fab` · `ga-panel` · `ga-header` · `ga-bottom-nav` ·
-`ga-bottom-sheet` · `ga-icon`
+`ga-bottom-sheet` · `ga-icon` · `ga-select` · `ga-calendar` ·
+`ga-date-input` · `ga-chart-frame` · `ga-chat` · `ga-chat-message`
 
 New in this line-up:
 
