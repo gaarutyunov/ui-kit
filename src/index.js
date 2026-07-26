@@ -37,6 +37,12 @@ import "./components/header/header.js";
 import "./components/bottom-sheet/bottom-sheet.js";
 import "./components/bottom-nav/bottom-nav.js";
 import "./components/icon/icon.js";
+import "./components/select/select.js";
+import "./components/calendar/calendar.js";
+import "./components/date-input/date-input.js";
+import "./components/chart-frame/chart-frame.js";
+import "./components/chat-message/chat-message.js";
+import "./components/chat/chat.js";
 
 export { GaButton } from "./components/button/button.js";
 export { GaRadioGroup } from "./components/radio-group/radio-group.js";
