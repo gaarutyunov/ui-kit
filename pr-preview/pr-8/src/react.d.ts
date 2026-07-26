@@ -208,6 +208,12 @@ declare module "react" {
       "ga-bottom-nav": GaBottomNavAttrs;
       "ga-bottom-sheet": GaBottomSheetAttrs;
       "ga-icon": GaIconAttrs;
+      "ga-select": GaSelectAttrs;
+      "ga-calendar": GaCalendarAttrs;
+      "ga-date-input": GaDateInputAttrs;
+      "ga-chart-frame": GaChartFrameAttrs;
+      "ga-chat-message": GaChatMessageAttrs;
+      "ga-chat": GaChatAttrs;
     }
   }
 }
