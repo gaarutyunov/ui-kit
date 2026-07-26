@@ -91,6 +91,9 @@ export class GaCalendar extends GaElement {
       border-color: var(--ga-fg, #ededed);
       font-weight: 600;
     }
+    /* aria-disabled rather than the disabled attribute: a disabled grid cell
+       must stay focusable, or arrow-key navigation dead-ends on it (WAI-ARIA
+       grid pattern). Selection is guarded in _select instead. */
     .day[aria-disabled="true"] { opacity: 0.3; cursor: not-allowed; }
     .day:focus-visible { outline: none; box-shadow: var(--ga-ring, 0 0 0 2px #000, 0 0 0 4px #54a2ff); }
     :host([disabled]) { opacity: 0.5; pointer-events: none; }
@@ -165,7 +168,7 @@ export class GaCalendar extends GaElement {
             data-iso="${iso}"
             tabindex="${iso === this._tabDate() ? "0" : "-1"}"
             aria-selected="${isSelected}"
-            ${disabled ? `aria-disabled="true" disabled` : ""}
+            ${disabled ? `aria-disabled="true"` : ""}
             aria-label="${esc(longDate(iso, this._locale))}">${date.getUTCDate()}</button>
         </td>`;
       }
@@ -195,13 +198,25 @@ export class GaCalendar extends GaElement {
     `;
   }
 
-  /** The single day that holds tabindex="0" (roving tabindex). */
+  /**
+   * The single day that holds tabindex="0" (roving tabindex).
+   *
+   * Prefers a day that is actually selectable: an explicit focus target, then
+   * the value, then today, then the first in-range day of the month — so
+   * tabbing into a month that begins before `min` does not land on a dead cell.
+   */
   _tabDate() {
     const month = this._month;
-    const candidates = [this._focusDate, this.attr("value"), todayISO(), `${month}-01`];
+    const candidates = [this._focusDate, this.attr("value"), todayISO()];
     for (const iso of candidates) {
-      if (isISODate(iso) && iso.slice(0, 7) === month) return iso;
+      if (isISODate(iso) && iso.slice(0, 7) === month && !this._isDisabled(iso)) return iso;
     }
+    const days = new Date(Date.UTC(Number(month.slice(0, 4)), Number(month.slice(5, 7)), 0)).getUTCDate();
+    for (let d = 1; d <= days; d++) {
+      const iso = `${month}-${String(d).padStart(2, "0")}`;
+      if (!this._isDisabled(iso)) return iso;
+    }
+    // Every day in this month is out of range; the first one still needs a stop.
     return `${month}-01`;
   }
 

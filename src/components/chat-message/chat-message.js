@@ -74,6 +74,19 @@ export class GaChatMessage extends GaElement {
     .dots i:nth-child(3) { animation-delay: 0.3s; }
     @keyframes blink { 0%, 60%, 100% { opacity: 0.25; } 30% { opacity: 1; } }
 
+    /* Visible to assistive technology, not on screen. */
+    .sr {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      clip-path: inset(50%);
+      white-space: nowrap;
+      border: 0;
+    }
     .caret {
       display: inline-block;
       width: 2px;
@@ -92,6 +105,11 @@ export class GaChatMessage extends GaElement {
     const time = this.attr("time");
 
     // A pending turn has no body yet, so the dots *are* the body.
+    // Described by, never labelled by: an aria-label on the bubble *replaces*
+    // the message text as its accessible name, so a screen reader would read
+    // "Coach" instead of what Coach said.
+    const status = statusFor(role, state, author);
+
     const body =
       state === "pending"
         ? `<span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>`
@@ -101,6 +119,12 @@ export class GaChatMessage extends GaElement {
     // every re-render would be noise.
     const live = state === "streaming" || state === "pending" ? `aria-live="polite"` : "";
 
+    // One role, resolved by precedence: a system notice stays a note even when
+    // it failed, and only a non-system failure is an alert. Emitting both
+    // attributes left the browser to pick, which is not a decision to delegate.
+    const aria =
+      role === "system" ? `role="note"` : state === "error" ? `role="alert"` : "";
+
     return /* html */ `
       <div class="row" part="row">
         ${author || time
@@ -109,20 +133,21 @@ export class GaChatMessage extends GaElement {
               ${time ? `<time>${esc(time)}</time>` : ""}
             </div>`
           : ""}
-        <div class="bubble" part="bubble" ${live}
-          ${state === "error" ? `role="alert"` : ""}
-          ${role === "system" ? `role="note"` : ""}
-          aria-label="${esc(labelFor(role, state, author))}">${body}</div>
+        <div class="bubble" part="bubble" ${live} ${aria}
+          ${status ? `aria-describedby="status"` : ""}>${body}${
+            status ? `<span id="status" class="sr">${esc(status)}</span>` : ""
+          }</div>
       </div>
     `;
   }
 }
 
-function labelFor(role, state, author) {
+/** Extra context for a turn that is not simply sent — appended, not substituted. */
+function statusFor(role, state, author) {
   const who = author || { user: "You", assistant: "Assistant", system: "System" }[role] || role;
   if (state === "pending") return `${who} is replying`;
   if (state === "error") return `${who}, failed to send`;
-  return who;
+  return "";
 }
 
 define("ga-chat-message", GaChatMessage);

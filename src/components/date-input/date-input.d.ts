@@ -23,7 +23,11 @@ export function parseDate(text: any, locale: any): string | null;
  *   value (YYYY-MM-DD), label, placeholder, hint, error, name, locale,
  *   min, max, first-day, disabled, required (boolean)
  *
- * Events: `input`, `change` — both with { value } detail.
+ * Events:
+ *   `change` — a date was committed. detail: { value } as YYYY-MM-DD, or "".
+ *   `input`  — fires while typing. detail: { value, text } — `value` is the
+ *              parsed, in-range date or "", and `text` is the raw field
+ *              contents, so `value` never carries half-typed input.
  */
 export class GaDateInput extends GaElement {
     static formAssociated: boolean;

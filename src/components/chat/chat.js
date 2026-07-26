@@ -149,7 +149,15 @@ export class GaChat extends GaElement {
     // subtree too, or the transcript stops following mid-answer.
     this._observer?.disconnect();
     this._observer = new MutationObserver(() => this._onContentChanged());
-    this._observer.observe(this, { childList: true, subtree: true, characterData: true });
+    // attributes too: a turn going pending → streaming → sent changes height
+    // without adding a node or editing text, and the transcript has to follow
+    // that as well.
+    this._observer.observe(this, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+      attributes: true,
+    });
 
     this._onContentChanged();
     // The first paint lands at the newest message without animating there.
@@ -175,7 +183,10 @@ export class GaChat extends GaElement {
       if (slot && box) box.classList.toggle("empty", slot.assignedNodes().length === 0);
     }
 
-    if (this._following) this._scrollToLatest();
+    // Automatic follow is instant: a smooth scroll restarted on every token of
+    // a streaming reply never catches up, and animates continuously while it
+    // tries. Smooth is for the jump button, where it is a deliberate move.
+    if (this._following) this._scrollToLatest({ smooth: false });
     this._syncJump();
   }
 
