@@ -19,7 +19,11 @@ import "../calendar/calendar.js";
  *   value (YYYY-MM-DD), label, placeholder, hint, error, name, locale,
  *   min, max, first-day, disabled, required (boolean)
  *
- * Events: `input`, `change` — both with { value } detail.
+ * Events:
+ *   `change` — a date was committed. detail: { value } as YYYY-MM-DD, or "".
+ *   `input`  — fires while typing. detail: { value, text } — `value` is the
+ *              parsed, in-range date or "", and `text` is the raw field
+ *              contents, so `value` never carries half-typed input.
  */
 export class GaDateInput extends GaElement {
   static formAssociated = true;
@@ -176,7 +180,13 @@ export class GaDateInput extends GaElement {
     input.addEventListener("input", () => {
       // Do not reflect to the attribute on every keystroke: that re-renders
       // the shadow tree and drops the caret (same reason as ga-input).
-      this.emit("input", { value: input.value });
+      //
+      // `value` stays the contract it claims to be — a YYYY-MM-DD date or "" —
+      // so a listener never receives half-typed text under that name. What was
+      // typed rides alongside as `text`, for a caller that wants it.
+      const parsed = parseDate(input.value.trim(), this._locale);
+      const usable = parsed && !this._outOfRange(parsed) ? parsed : "";
+      this.emit("input", { value: usable, text: input.value });
     });
     input.addEventListener("change", () => this._commitTyped(input.value));
     input.addEventListener("keydown", (e) => {
@@ -189,6 +199,11 @@ export class GaDateInput extends GaElement {
         this._openPanel();
       }
     });
+
+    // render() rebuilds the shadow tree, which drops the invalid styling and
+    // leaves ElementInternals holding validity for an <input> that no longer
+    // exists. Reapply it against the new one.
+    this._setInvalid(this._invalid);
 
     calendar?.addEventListener("change", (e) => {
       e.stopPropagation(); // the calendar's event is internal; ours is the API
@@ -258,13 +273,20 @@ export class GaDateInput extends GaElement {
 
   _setInvalid(invalid) {
     this._invalid = invalid;
+    const input = this.$("input");
     this.$(".control")?.classList.toggle("invalid", invalid);
-    this.$("input")?.setAttribute("aria-invalid", String(invalid || Boolean(this.attr("error"))));
-    this._internals?.setValidity?.(
-      invalid ? { badInput: true } : {},
-      invalid ? "Enter a valid date." : "",
-      this.$("input") ?? undefined
-    );
+    input?.setAttribute("aria-invalid", String(invalid || Boolean(this.attr("error"))));
+
+    // A required field with nothing in it is invalid too, and for a different
+    // reason than an unparseable one — the form needs to be told which.
+    const missing = this.hasFlag("required") && !this.attr("value");
+    if (invalid) {
+      this._internals?.setValidity?.({ badInput: true }, "Enter a valid date.", input ?? undefined);
+    } else if (missing) {
+      this._internals?.setValidity?.({ valueMissing: true }, "Choose a date.", input ?? undefined);
+    } else {
+      this._internals?.setValidity?.({}, "");
+    }
   }
 
   _commit(iso) {

@@ -114,8 +114,12 @@
   --ga-chart-7: #cc79a7; /* reddish purple */
   --ga-chart-8: #7f7f7f; /* grey */
 
+  /* The axis delimits the plot, so it is structure a reader needs and clears
+     3:1 against --ga-bg-elev (3.4:1). Gridlines are a decorative reading aid —
+     the data is legible without them — so they stay quiet deliberately; do not
+     encode meaning in a gridline. */
   --ga-chart-grid: #1f1f1f;
-  --ga-chart-axis: #454545;
+  --ga-chart-axis: #6e6e6e;
   --ga-chart-label: #878787;
   --ga-chart-tooltip-bg: #1a1a1a;
   --ga-chart-tooltip-fg: #ededed;
@@ -164,7 +168,7 @@
   --ga-chart-8: #6b6b6b;
 
   --ga-chart-grid: #ececec;
-  --ga-chart-axis: #cfcfcf;
+  --ga-chart-axis: #8a8a8a; /* 3.2:1 on --ga-bg-elev */
   --ga-chart-label: #666666;
   --ga-chart-tooltip-bg: #ffffff;
   --ga-chart-tooltip-fg: #1a1a1a;

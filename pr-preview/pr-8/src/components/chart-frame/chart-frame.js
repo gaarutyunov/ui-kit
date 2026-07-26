@@ -38,13 +38,10 @@ export class GaChartFrame extends GaElement {
       border-radius: var(--ga-radius-lg, 8px);
       padding: var(--ga-space-4, 16px);
     }
-    .head {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: var(--ga-space-3, 12px);
-      flex-wrap: wrap;
-    }
+    /* The caption and the legend are siblings of the plot (the caption has to
+       be a direct child of <figure>), so the frame lays out the header row. */
+    .frame > .title { order: -2; }
+    .frame > .legend { order: -1; }
     .title {
       font-size: var(--ga-fs-sm, 14px);
       font-weight: 600;
@@ -104,13 +101,28 @@ export class GaChartFrame extends GaElement {
     }
   `;
 
+  /**
+   * Legend entries, normalised to `{ label, color? }`.
+   *
+   * A malformed entry (a bare string, a null, a number) is coerced rather than
+   * thrown away or allowed through as-is, so `template()` never has to guess
+   * what it is holding.
+   */
   _legend() {
+    let parsed;
     try {
-      const parsed = JSON.parse(this.attr("legend", "[]"));
-      return Array.isArray(parsed) ? parsed : [];
+      parsed = JSON.parse(this.attr("legend", "[]"));
     } catch {
       return [];
     }
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .filter((entry) => entry != null)
+      .map((entry) =>
+        typeof entry === "object"
+          ? { label: String(entry.label ?? ""), color: entry.color ? String(entry.color) : "" }
+          : { label: String(entry), color: "" }
+      );
   }
 
   template() {
@@ -140,12 +152,12 @@ export class GaChartFrame extends GaElement {
 
     return /* html */ `
       <figure class="frame" part="frame" style="--plot-height:${esc(height)}">
-        ${title || items
-          ? `<div class="head">
-              ${title ? `<figcaption class="title" part="title">${esc(title)}</figcaption>` : ""}
-              ${items ? `<ul class="legend" part="legend">${items}</ul>` : ""}
-            </div>`
-          : ""}
+        ${/* <figcaption> must be a direct child of <figure> — nesting it in a
+              wrapper drops the figure's accessible name. The legend keeps its
+              own container; the caption sits beside it and the two are laid
+              out by .frame. */ ""}
+        ${title ? `<figcaption class="title" part="title">${esc(title)}</figcaption>` : ""}
+        ${items ? `<ul class="legend" part="legend">${items}</ul>` : ""}
         <div class="plot" part="plot" aria-busy="${loading}">
           <slot></slot>
           ${state}

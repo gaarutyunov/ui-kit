@@ -36,7 +36,13 @@ export class GaCalendar extends GaElement {
     /** The month on display, as YYYY-MM. */
     get _month(): any;
     _isDisabled(iso: any): boolean;
-    /** The single day that holds tabindex="0" (roving tabindex). */
+    /**
+     * The single day that holds tabindex="0" (roving tabindex).
+     *
+     * Prefers a day that is actually selectable: an explicit focus target, then
+     * the value, then today, then the first in-range day of the month — so
+     * tabbing into a month that begins before `min` does not land on a dead cell.
+     */
     _tabDate(): any;
     _shiftMonth(step: any): void;
     _onKey(e: any): void;

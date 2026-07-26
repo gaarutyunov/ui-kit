@@ -24,6 +24,16 @@
  */
 export class GaChartFrame extends GaElement {
     static observed: string[];
-    _legend(): any[];
+    /**
+     * Legend entries, normalised to `{ label, color? }`.
+     *
+     * A malformed entry (a bare string, a null, a number) is coerced rather than
+     * thrown away or allowed through as-is, so `template()` never has to guess
+     * what it is holding.
+     */
+    _legend(): {
+        label: string;
+        color: string;
+    }[];
 }
 import { GaElement } from "../../core/base-element.js";

@@ -47,6 +47,9 @@ export class GaSelect extends GaElement {
         readonly open: boolean;
         destroy(): void;
     } | null;
+    _values: any;
+    _reflecting: boolean;
+    attributeChangedCallback(name: any, oldValue: any, newValue: any): void;
     /** Options from the JSON attribute, falling back to slotted <option>s. */
     _allOptions(): {
         value: string;
@@ -60,11 +63,24 @@ export class GaSelect extends GaElement {
         disabled: boolean;
     }[];
     get multiple(): boolean;
-    /** Selected values, always as an array — the single-value case is length 1. */
-    _selected(): string[];
+    /**
+     * Selected values, always as an array — the single-value case is length 1.
+     *
+     * The internal array is authoritative and the `value` attribute mirrors it,
+     * because the mirror is lossy: multi-select joins on a comma, so an option
+     * value that *contains* a comma would split into two on the way back. Going
+     * through `_values` means selection and the `.value` property round-trip
+     * such a value correctly; only assigning the comma-joined attribute from
+     * outside cannot (documented on the attribute).
+     */
+    _selected(): any;
+    /** Set the selection and mirror it to the attribute. */
+    _setSelected(values: any): void;
     _summary(): string;
     /** The option rows alone, so filtering can repaint them without a re-render. */
     _rows(): string;
+    /** Slotted options changed: refresh what is derived from them, not the tree. */
+    _onSlotChange(): void;
     disconnectedCallback(): void;
     _bindRows(): void;
     /** Repaint only the rows — keeps the filter field's focus and caret. */
@@ -87,9 +103,9 @@ export class GaSelect extends GaElement {
     _commit(value: any, { keepOpen }?: {
         keepOpen?: boolean | undefined;
     }): void;
-    _formValue(): string | FormData;
-    set value(v: string | string[]);
-    get value(): string | string[];
+    _formValue(): any;
+    set value(v: any);
+    get value(): any;
     set options(list: {
         value: string;
         label: string;

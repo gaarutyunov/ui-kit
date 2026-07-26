@@ -91,8 +91,13 @@ const selectedDay = cal.shadowRoot.querySelector('.day[aria-selected="true"]');
 ok("calendar: marks the selected day", selectedDay?.dataset.iso === "2026-03-14", selectedDay?.dataset.iso);
 ok("calendar: exactly one roving tabstop",
    cal.shadowRoot.querySelectorAll('.day[tabindex="0"]').length === 1);
-ok("calendar: out-of-range days are disabled",
-   cal.shadowRoot.querySelector('.day[data-iso="2026-03-01"]')?.hasAttribute("disabled") === true);
+{
+  // aria-disabled, NOT the disabled attribute: a disabled grid cell has to stay
+  // focusable or arrow-key navigation dead-ends on it (WAI-ARIA grid pattern).
+  const out = cal.shadowRoot.querySelector('.day[data-iso="2026-03-01"]');
+  ok("calendar: out-of-range days are aria-disabled", out?.getAttribute("aria-disabled") === "true");
+  ok("calendar: ...but still focusable", out?.hasAttribute("disabled") === false);
+}
 
 let calChanged = null;
 cal.addEventListener("change", (e) => { calChanged = e.detail.value; });
@@ -177,11 +182,18 @@ for (let i = 0; i < 12; i++) {
   chat.insertAdjacentHTML("beforeend", `<ga-chat-message role="assistant">Filler ${i}</ga-chat-message>`);
 }
 await frame();
+// .log sets scroll-behavior: smooth, so assigning scrollTop animates and the
+// synthetic scroll event below would read a stale position. Jump instantly.
+log.style.scrollBehavior = "auto";
 log.scrollTop = 0;
 log.dispatchEvent(new Event("scroll"));
 await frame();
+const scrollable = log.scrollHeight > log.clientHeight;
+ok("chat: transcript is actually scrollable (layout ran)", scrollable,
+   `scrollHeight=${log.scrollHeight} clientHeight=${log.clientHeight}`);
 ok("chat: scrolling up reveals jump-to-latest",
-   chat.shadowRoot.querySelector(".jump").hidden === false);
+   !scrollable || chat.shadowRoot.querySelector(".jump").hidden === false,
+   scrollable ? "" : "skipped — nothing to scroll in this environment");
 const jump = chat.shadowRoot.querySelector(".jump");
 ok("chat: jump-to-latest is a real button", jump.tagName === "BUTTON" && !jump.disabled);
 jump.click();

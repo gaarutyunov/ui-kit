@@ -144,6 +144,17 @@ export class GaSelect extends GaElement {
     this._typeaheadAt = 0;
     this._filterTimer = 0;
     this._popup = null;
+    // null means "read the attribute"; an array means the attribute is a mirror.
+    this._values = null;
+    this._reflecting = false;
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    // An external `value=` assignment replaces the selection, so the array
+    // stops being authoritative — but our own mirror must not do that, or a
+    // value containing a comma would be split straight back apart.
+    if (name === "value" && !this._reflecting) this._values = null;
+    super.attributeChangedCallback(name, oldValue, newValue);
   }
 
   /* --- options ---------------------------------------------------------- */
@@ -178,11 +189,29 @@ export class GaSelect extends GaElement {
     return this.hasFlag("multiple");
   }
 
-  /** Selected values, always as an array — the single-value case is length 1. */
+  /**
+   * Selected values, always as an array — the single-value case is length 1.
+   *
+   * The internal array is authoritative and the `value` attribute mirrors it,
+   * because the mirror is lossy: multi-select joins on a comma, so an option
+   * value that *contains* a comma would split into two on the way back. Going
+   * through `_values` means selection and the `.value` property round-trip
+   * such a value correctly; only assigning the comma-joined attribute from
+   * outside cannot (documented on the attribute).
+   */
   _selected() {
+    if (this._values) return this._values;
     const raw = this.attr("value");
     if (!raw) return [];
     return this.multiple ? raw.split(",").filter(Boolean) : [raw];
+  }
+
+  /** Set the selection and mirror it to the attribute. */
+  _setSelected(values) {
+    this._values = values;
+    this._reflecting = true;
+    this.setAttribute("value", values.join(","));
+    this._reflecting = false;
   }
 
   /* --- template --------------------------------------------------------- */
@@ -296,8 +325,21 @@ export class GaSelect extends GaElement {
 
     this._bindRows();
 
-    // Slotted <option>s can arrive after the first render.
-    this.$("slot")?.addEventListener("slotchange", () => this.render());
+    // Slotted <option>s can arrive after the first render — but re-rendering
+    // replaces the <slot> element, which fires slotchange again, which renders
+    // again: an infinite loop that locks the tab. Repaint the rows and the
+    // trigger summary instead; neither replaces the slot.
+    this.$("slot")?.addEventListener("slotchange", () => this._onSlotChange());
+  }
+
+  /** Slotted options changed: refresh what is derived from them, not the tree. */
+  _onSlotChange() {
+    const summary = this.$(".trigger");
+    if (summary) {
+      const caret = summary.querySelector(".caret");
+      summary.innerHTML = this._summary() + (caret ? caret.outerHTML : "");
+    }
+    this._repaintRows();
   }
 
   disconnectedCallback() {
@@ -397,21 +439,27 @@ export class GaSelect extends GaElement {
         e.preventDefault();
         this._close();
         return;
-      case "Tab":
+      case "Tab": {
         // Tab commits the active option and lets focus move on.
-        if (options[this._active]) this._commit(options[this._active].value, { keepOpen: false });
+        const option = enabledAt(options, this._active);
+        if (option) this._commit(option.value, { keepOpen: false });
         else this._close({ focusTrigger: false });
         return;
-      case "Enter":
+      }
+      case "Enter": {
         e.preventDefault();
-        if (options[this._active]) this._commit(options[this._active].value);
+        const option = enabledAt(options, this._active);
+        if (option) this._commit(option.value);
         return;
-      case " ":
+      }
+      case " ": {
         // Space types into the filter field rather than selecting.
         if (this.hasFlag("filterable") && e.target === this.$(".filter")) return;
         e.preventDefault();
-        if (options[this._active]) this._commit(options[this._active].value);
+        const option = enabledAt(options, this._active);
+        if (option) this._commit(option.value);
         return;
+      }
       case "ArrowDown":
         e.preventDefault();
         this._move(1, options);
@@ -506,13 +554,14 @@ export class GaSelect extends GaElement {
     let next;
     if (this.multiple) {
       const selected = this._selected();
-      next = selected.includes(value)
+      const values = selected.includes(value)
         ? selected.filter((v) => v !== value)
         : [...selected, value];
-      this.setAttribute("value", next.join(","));
+      this._setSelected(values);
+      next = values;
     } else {
       next = value;
-      this.setAttribute("value", value);
+      this._setSelected([value]);
     }
 
     this._internals?.setFormValue(this._formValue());
@@ -545,7 +594,12 @@ export class GaSelect extends GaElement {
   }
 
   set value(v) {
-    this.setAttribute("value", Array.isArray(v) ? v.join(",") : String(v ?? ""));
+    if (Array.isArray(v)) {
+      this._setSelected(v.map(String));
+      return;
+    }
+    const next = String(v ?? "");
+    this._setSelected(next ? [next] : []);
   }
 
   get options() {
@@ -555,6 +609,12 @@ export class GaSelect extends GaElement {
   set options(list) {
     this.setAttribute("options", JSON.stringify(list ?? []));
   }
+}
+
+/** The option at `index`, unless it is disabled — the keyboard must not commit one. */
+function enabledAt(options, index) {
+  const option = options[index];
+  return option && !option.disabled ? option : null;
 }
 
 /** Accept both { value, label } and a bare string. */
