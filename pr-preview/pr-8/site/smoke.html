@@ -1,0 +1,221 @@
+<!doctype html>
+<html data-theme="dark">
+<head><meta charset="utf-8"><title>ui-kit smoke checks</title>
+<link rel="stylesheet" href="../src/tokens/tokens.css">
+</head>
+<body style="font-family:ui-sans-serif,system-ui,sans-serif;background:var(--ga-bg);color:var(--ga-fg);padding:24px;">
+<h1 style="font-size:16px;">ui-kit smoke checks</h1>
+<p style="font-size:13px;color:var(--ga-muted);max-width:60ch;">
+  Behavioural checks for the components added in
+  <a href="https://github.com/gaarutyunov/ui-kit/issues/6">#6</a> — roles, keyboard
+  paths, date parsing, scroll-follow and the theme tokens. The kit has no test
+  runner by design, so this is a page you open: <code>npm run dev</code>, then
+  <code>/site/smoke.html</code>. The summary below says PASS or FAIL per check;
+  the tab title carries the total.
+</p>
+<div id="stage"></div>
+<pre id="out" style="font-size:12px;line-height:1.7;white-space:pre-wrap;"></pre>
+<script type="module">
+import "../src/index.js";
+
+const results = [];
+const ok = (name, cond, extra = "") =>
+  results.push(`${cond ? "PASS" : "FAIL"}  ${name}${extra ? " — " + extra : ""}`);
+const stage = document.getElementById("stage");
+// setTimeout rather than requestAnimationFrame: rAF does not fire in headless
+// Chrome when the page is never composited, which hangs the run.
+const frame = () => new Promise(r => setTimeout(r, 16));
+
+function mount(html) {
+  stage.innerHTML = html;
+  return stage.firstElementChild;
+}
+
+await customElements.whenDefined("ga-select");
+await customElements.whenDefined("ga-calendar");
+await customElements.whenDefined("ga-date-input");
+await customElements.whenDefined("ga-chart-frame");
+await customElements.whenDefined("ga-chat");
+await customElements.whenDefined("ga-chat-message");
+ok("all six elements registered", true);
+
+/* ---- ga-select ------------------------------------------------------- */
+const sel = mount(`<ga-select label="Unit" value="kg"
+  options='[{"value":"kg","label":"Kilograms"},{"value":"lb","label":"Pounds"},{"value":"st","label":"Stone","disabled":true}]'></ga-select>`);
+await frame();
+const trigger = sel.shadowRoot.querySelector(".trigger");
+ok("select: combobox role", trigger?.getAttribute("role") === "combobox");
+ok("select: summary shows the selected label",
+   trigger.textContent.includes("Kilograms"), trigger.textContent.trim());
+
+trigger.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
+await frame();
+ok("select: opens on ArrowDown", trigger.getAttribute("aria-expanded") === "true");
+ok("select: listbox role present",
+   sel.shadowRoot.querySelector("#listbox")?.getAttribute("role") === "listbox");
+ok("select: activedescendant set while open",
+   Boolean(trigger.getAttribute("aria-activedescendant")));
+
+let changed = null;
+sel.addEventListener("change", (e) => { changed = e.detail.value; });
+trigger.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
+trigger.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+await frame();
+ok("select: Enter commits the active option", sel.value === "lb", `value=${sel.value}`);
+ok("select: change event carries the value", changed === "lb", String(changed));
+ok("select: closes after commit",
+   sel.shadowRoot.querySelector(".trigger").getAttribute("aria-expanded") === "false");
+
+// A disabled option must be skipped by the keyboard.
+const sel2 = mount(`<ga-select value="lb"
+  options='[{"value":"kg","label":"Kilograms"},{"value":"lb","label":"Pounds"},{"value":"st","label":"Stone","disabled":true}]'></ga-select>`);
+await frame();
+const t2 = sel2.shadowRoot.querySelector(".trigger");
+t2.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
+await frame();
+t2.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
+t2.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+await frame();
+ok("select: keyboard skips a disabled option", sel2.value !== "st", `value=${sel2.value}`);
+
+// Slotted <option> children are an equivalent source.
+const sel3 = mount(`<ga-select label="Split"><option value="ppl">Push</option><option value="ul">Upper</option></ga-select>`);
+await frame();
+ok("select: reads slotted <option>s", sel3.options.length === 2, `n=${sel3.options.length}`);
+
+/* ---- ga-calendar ----------------------------------------------------- */
+const cal = mount(`<ga-calendar value="2026-03-14" min="2026-03-02" max="2026-03-24"></ga-calendar>`);
+await frame();
+ok("calendar: grid role", cal.shadowRoot.querySelector("table")?.getAttribute("role") === "grid");
+const selectedDay = cal.shadowRoot.querySelector('.day[aria-selected="true"]');
+ok("calendar: marks the selected day", selectedDay?.dataset.iso === "2026-03-14", selectedDay?.dataset.iso);
+ok("calendar: exactly one roving tabstop",
+   cal.shadowRoot.querySelectorAll('.day[tabindex="0"]').length === 1);
+ok("calendar: out-of-range days are disabled",
+   cal.shadowRoot.querySelector('.day[data-iso="2026-03-01"]')?.hasAttribute("disabled") === true);
+
+let calChanged = null;
+cal.addEventListener("change", (e) => { calChanged = e.detail.value; });
+cal.shadowRoot.querySelector('.day[data-iso="2026-03-18"]').click();
+await frame();
+ok("calendar: clicking a day commits it", cal.value === "2026-03-18" && calChanged === "2026-03-18",
+   `value=${cal.value}`);
+
+// Arrow keys move the roving focus, crossing the month boundary.
+const cal2 = mount(`<ga-calendar value="2026-03-31"></ga-calendar>`);
+await frame();
+cal2.shadowRoot.querySelector('.day[data-iso="2026-03-31"]')
+  .dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+await frame();
+ok("calendar: arrow past month end flips the month",
+   cal2.getAttribute("month") === "2026-04", cal2.getAttribute("month"));
+
+/* ---- ga-date-input --------------------------------------------------- */
+const di = mount(`<ga-date-input label="Date" locale="en-GB" min="2026-01-01" max="2026-12-31"></ga-date-input>`);
+await frame();
+const field = di.shadowRoot.querySelector("input");
+ok("date-input: placeholder follows the locale order",
+   field.placeholder === "DD/MM/YYYY", field.placeholder);
+
+field.value = "14/03/2026";
+field.dispatchEvent(new Event("change", { bubbles: true }));
+await frame();
+ok("date-input: parses the locale's own order", di.value === "2026-03-14", `value=${di.value}`);
+
+const di2 = mount(`<ga-date-input locale="en-US"></ga-date-input>`);
+await frame();
+const f2 = di2.shadowRoot.querySelector("input");
+f2.value = "3/14/2026";
+f2.dispatchEvent(new Event("change", { bubbles: true }));
+await frame();
+ok("date-input: month-first locale parses month-first", di2.value === "2026-03-14", `value=${di2.value}`);
+
+const di3 = mount(`<ga-date-input value="2026-03-14" min="2026-03-01" max="2026-03-31"></ga-date-input>`);
+await frame();
+const f3 = di3.shadowRoot.querySelector("input");
+f3.value = "2026-11-30";           // valid date, outside the range
+f3.dispatchEvent(new Event("change", { bubbles: true }));
+await frame();
+ok("date-input: out-of-range keeps the old value", di3.value === "2026-03-14", `value=${di3.value}`);
+ok("date-input: out-of-range flags the field",
+   di3.shadowRoot.querySelector(".control").classList.contains("invalid"));
+
+const di4 = mount(`<ga-date-input value="2026-03-14"></ga-date-input>`);
+await frame();
+const f4 = di4.shadowRoot.querySelector("input");
+f4.value = "2026-02-31";           // 31 February does not exist
+f4.dispatchEvent(new Event("change", { bubbles: true }));
+await frame();
+ok("date-input: rejects an impossible date", di4.value === "2026-03-14", `value=${di4.value}`);
+
+/* ---- ga-chart-frame -------------------------------------------------- */
+const cf = mount(`<ga-chart-frame title="Volume" legend='[{"label":"Squat"},{"label":"Bench"}]'><svg viewBox="0 0 10 10"></svg></ga-chart-frame>`);
+await frame();
+ok("chart-frame: renders the legend",
+   cf.shadowRoot.querySelectorAll(".legend li").length === 2);
+ok("chart-frame: swatches come from the palette tokens",
+   cf.shadowRoot.querySelector(".swatch").style.getPropertyValue("--swatch").includes("--ga-chart-1"));
+const cfEmpty = mount(`<ga-chart-frame empty empty-text="No sessions"></ga-chart-frame>`);
+await frame();
+ok("chart-frame: empty state", cfEmpty.shadowRoot.querySelector(".state")?.textContent.includes("No sessions"));
+
+/* ---- ga-chat --------------------------------------------------------- */
+const chat = mount(`<ga-chat height="120px">
+  <ga-chat-message role="user">One</ga-chat-message>
+  <ga-chat-message role="assistant">Two</ga-chat-message>
+</ga-chat>`);
+await frame();
+const log = chat.shadowRoot.querySelector(".log");
+ok("chat: log role", log?.getAttribute("role") === "log");
+ok("chat: placeholder hidden when there are messages",
+   chat.shadowRoot.querySelector(".placeholder").hidden === true);
+ok("chat: jump button hidden while following",
+   chat.shadowRoot.querySelector(".jump").hidden === true);
+
+// Scroll up: following stops and the jump affordance appears.
+for (let i = 0; i < 12; i++) {
+  chat.insertAdjacentHTML("beforeend", `<ga-chat-message role="assistant">Filler ${i}</ga-chat-message>`);
+}
+await frame();
+log.scrollTop = 0;
+log.dispatchEvent(new Event("scroll"));
+await frame();
+ok("chat: scrolling up reveals jump-to-latest",
+   chat.shadowRoot.querySelector(".jump").hidden === false);
+const jump = chat.shadowRoot.querySelector(".jump");
+ok("chat: jump-to-latest is a real button", jump.tagName === "BUTTON" && !jump.disabled);
+jump.click();
+await frame();
+ok("chat: activating it resumes following",
+   chat.shadowRoot.querySelector(".jump").hidden === true);
+
+const empty = mount(`<ga-chat empty-text="Nothing here"></ga-chat>`);
+await frame();
+ok("chat: empty state shown with no messages",
+   empty.shadowRoot.querySelector(".placeholder").hidden === false);
+
+const streaming = mount(`<ga-chat-message role="assistant" state="streaming">Partial</ga-chat-message>`);
+await frame();
+ok("chat-message: streaming turn is a live region",
+   streaming.shadowRoot.querySelector(".bubble").getAttribute("aria-live") === "polite");
+const errored = mount(`<ga-chat-message role="assistant" state="error">Nope</ga-chat-message>`);
+await frame();
+ok("chat-message: error turn is an alert",
+   errored.shadowRoot.querySelector(".bubble").getAttribute("role") === "alert");
+
+/* ---- themes ---------------------------------------------------------- */
+for (const theme of ["dark", "light"]) {
+  document.documentElement.setAttribute("data-theme", theme);
+  await frame();
+  const chartToken = getComputedStyle(document.documentElement).getPropertyValue("--ga-chart-1").trim();
+  const bg = getComputedStyle(document.documentElement).getPropertyValue("--ga-bg").trim();
+  ok(`theme ${theme}: chart palette resolves`, Boolean(chartToken), `--ga-chart-1=${chartToken} --ga-bg=${bg}`);
+}
+document.documentElement.setAttribute("data-theme", "dark");
+
+const failed = results.filter(r => r.startsWith("FAIL"));
+document.getElementById("out").textContent = results.join("\n");
+document.title = failed.length ? `FAILED ${failed.length}/${results.length}` : `OK ${results.length}/${results.length}`;
+</script>
+</body>
+</html>
