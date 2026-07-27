@@ -37,7 +37,17 @@ import "./components/header/header.js";
 import "./components/bottom-sheet/bottom-sheet.js";
 import "./components/bottom-nav/bottom-nav.js";
 import "./components/icon/icon.js";
+import "./components/select/select.js";
+import "./components/calendar/calendar.js";
+import "./components/date-input/date-input.js";
+import "./components/chart-frame/chart-frame.js";
+import "./components/chat-message/chat-message.js";
+import "./components/chat/chat.js";
 
+/* index.d.ts declares a named export per component, so these have to exist at
+   runtime too — otherwise `import { GaButton } from "@gaarutyunov/ui-kit"`
+   type-checks and then resolves to undefined. The imports above still do the
+   registering; these only re-export the classes. */
 export { GaButton } from "./components/button/button.js";
 export { GaRadioGroup } from "./components/radio-group/radio-group.js";
 export { GaCode } from "./components/code/code.js";
@@ -61,3 +71,9 @@ export { GaHeader } from "./components/header/header.js";
 export { GaBottomSheet } from "./components/bottom-sheet/bottom-sheet.js";
 export { GaBottomNav } from "./components/bottom-nav/bottom-nav.js";
 export { GaIcon } from "./components/icon/icon.js";
+export { GaSelect } from "./components/select/select.js";
+export { GaCalendar } from "./components/calendar/calendar.js";
+export { GaDateInput } from "./components/date-input/date-input.js";
+export { GaChartFrame } from "./components/chart-frame/chart-frame.js";
+export { GaChatMessage } from "./components/chat-message/chat-message.js";
+export { GaChat } from "./components/chat/chat.js";
