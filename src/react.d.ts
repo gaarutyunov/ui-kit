@@ -195,6 +195,91 @@ interface GaIconAttrs extends GaAttrs {
   size?: Numish;
 }
 
+interface GaSelectAttrs extends GaAttrs {
+  /** JSON: `{ value, label, disabled? }[]`; falls back to slotted `<option>` children. */
+  options?: string;
+  /**
+   * Selected value; comma-joined when `multiple`. The join is lossy, so a value
+   * that itself contains a comma must be set through the `.value` property.
+   */
+  value?: string;
+  /** Toggle rows without closing; the trigger summarises as "N selected". */
+  multiple?: Bool;
+  /** Show a filter field in the popup. */
+  filterable?: Bool;
+  placeholder?: string;
+  label?: string;
+  hint?: string;
+  error?: string;
+  name?: string;
+  disabled?: Bool;
+  required?: Bool;
+}
+
+interface GaCalendarAttrs extends GaAttrs {
+  /** Selected date, as `YYYY-MM-DD`. */
+  value?: string;
+  /** The month on display, as `YYYY-MM`; defaults to `value`'s month. */
+  month?: string;
+  /** Passed to `Intl` for month and weekday names. */
+  locale?: string;
+  /** `0` = Sunday … `6` = Saturday. Default `1` (Monday). */
+  "first-day"?: Numish;
+  /** Selectable range, as `YYYY-MM-DD`; days outside it are disabled. */
+  min?: string;
+  max?: string;
+  disabled?: Bool;
+}
+
+interface GaDateInputAttrs extends GaAttrs {
+  /** The date, and what the form submits: always `YYYY-MM-DD`. */
+  value?: string;
+  label?: string;
+  /** Defaults to the locale's own numeric pattern. */
+  placeholder?: string;
+  hint?: string;
+  error?: string;
+  name?: string;
+  /** Passed through to the calendar. */
+  locale?: string;
+  /** Accepted range, as `YYYY-MM-DD`; outside it the field errors and keeps the old value. */
+  min?: string;
+  max?: string;
+  /** Passed through to the calendar. `0` = Sunday … `6` = Saturday. */
+  "first-day"?: Numish;
+  disabled?: Bool;
+  required?: Bool;
+}
+
+interface GaChartFrameAttrs extends GaAttrs {
+  /** Caption above the plot. */
+  title?: string;
+  /** JSON: `{ label, color? }[]`; swatches take `--ga-chart-1…8` in series order. */
+  legend?: string;
+  /** CSS length — the minimum plot height. Default `180px`. */
+  height?: string;
+  /** Message for the empty state. Default `"No data"`. */
+  "empty-text"?: string;
+  loading?: Bool;
+  empty?: Bool;
+}
+
+interface GaChatMessageAttrs extends GaAttrs {
+  /** Alignment and treatment of the turn. Default `"assistant"`. */
+  role?: "user" | "assistant" | "system";
+  /** Whether the turn is settled. Default `"sent"`. */
+  state?: "sent" | "pending" | "streaming" | "error";
+  author?: string;
+  time?: string;
+}
+
+interface GaChatAttrs extends GaAttrs {
+  /** CSS length for the scrolling transcript. Default `360px`. */
+  height?: string;
+  /** Shown when there are no messages. */
+  "empty-text"?: string;
+}
+
 interface GaCheckboxAttrs extends GaAttrs {
   checked?: Bool;
   /** The "select all" state over a partial selection; wins over `checked` visually. */

@@ -1,0 +1,16 @@
+{
+  "//": "Type-CHECK only — no emit. tsconfig.json includes `src/**/*.js`, so the hand-written .d.ts roots at src/ are never type-checked by the generation run: a JSX entry could (and did) reference an interface that was never declared and nothing noticed until a consumer compiled it. This config roots src/react.d.ts so that mistake fails `npm run types`. Run on its own with `npm run types:check`.",
+  "//2": "skipLibCheck MUST stay false here. The files under check are themselves .d.ts, so skipLibCheck would skip exactly them — and false is also the consumer setting under which these declarations get checked at all.",
+  "//3": "src/index.d.ts and src/global.d.ts are deliberately NOT rooted yet: they pull in the generated component declarations, whose `attributeChangedCallback(name, old, value)` does not match the zero-argument `attributeChangedCallback()` on GaElement. Checking them reports pre-existing TS2416s that belong to their own fix.",
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": false,
+    "types": []
+  },
+  "files": ["src/react.d.ts"]
+}
