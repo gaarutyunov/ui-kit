@@ -33,6 +33,11 @@ import type { GaHeader } from "./components/header/header.js";
 import type { GaBottomSheet } from "./components/bottom-sheet/bottom-sheet.js";
 import type { GaBottomNav } from "./components/bottom-nav/bottom-nav.js";
 import type { GaIcon } from "./components/icon/icon.js";
+import type { GaCheckbox } from "./components/checkbox/checkbox.js";
+import type { GaFileButton } from "./components/file-button/file-button.js";
+import type { GaQuantity } from "./components/quantity/quantity.js";
+import type { GaMetric } from "./components/metric/metric.js";
+import type { GaStatus } from "./components/status/status.js";
 
 declare global {
   interface HTMLElementTagNameMap {
@@ -59,6 +64,11 @@ declare global {
     "ga-bottom-sheet": GaBottomSheet;
     "ga-bottom-nav": GaBottomNav;
     "ga-icon": GaIcon;
+    "ga-checkbox": GaCheckbox;
+    "ga-file-button": GaFileButton;
+    "ga-quantity": GaQuantity;
+    "ga-metric": GaMetric;
+    "ga-status": GaStatus;
   }
 }
 

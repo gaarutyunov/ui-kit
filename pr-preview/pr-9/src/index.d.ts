@@ -39,3 +39,8 @@ export { GaHeader } from "./components/header/header.js";
 export { GaBottomSheet } from "./components/bottom-sheet/bottom-sheet.js";
 export { GaBottomNav } from "./components/bottom-nav/bottom-nav.js";
 export { GaIcon } from "./components/icon/icon.js";
+export { GaCheckbox } from "./components/checkbox/checkbox.js";
+export { GaFileButton } from "./components/file-button/file-button.js";
+export { GaQuantity } from "./components/quantity/quantity.js";
+export { GaMetric } from "./components/metric/metric.js";
+export { GaStatus } from "./components/status/status.js";

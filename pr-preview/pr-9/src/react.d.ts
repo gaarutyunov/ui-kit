@@ -32,7 +32,8 @@ type Numish = string | number;
 
 interface GaButtonAttrs extends GaAttrs {
   variant?: "primary" | "secondary" | "ghost" | "danger";
-  size?: "sm" | "md" | "lg";
+  /** `"icon"` is a square, glyph-only button — it requires `aria-label` or `title`. */
+  size?: "sm" | "md" | "lg" | "icon";
   href?: string;
   download?: string | Bool;
   target?: string;
@@ -99,6 +100,7 @@ interface GaInputAttrs extends GaAttrs {
   error?: string;
   required?: Bool;
   disabled?: Bool;
+  readonly?: Bool;
 }
 
 interface GaSwitchAttrs extends GaAttrs {
@@ -136,6 +138,9 @@ interface GaSliderAttrs extends GaAttrs {
   step?: Numish;
   value?: Numish;
   label?: string;
+  "label-start"?: string;
+  "label-end"?: string;
+  "hide-value"?: Bool;
   disabled?: Bool;
 }
 
@@ -155,6 +160,10 @@ interface GaPanelAttrs extends GaAttrs {
   open?: Bool;
   side?: "right" | "left";
   title?: string;
+  /** Float above page content at `--ga-z-overlay` instead of acting as a drawer. */
+  overlay?: Bool;
+  /** Confine Tab to the panel while open. OFF by default. */
+  "trap-focus"?: Bool;
 }
 
 interface GaHeaderAttrs extends GaAttrs {
@@ -173,6 +182,10 @@ interface GaBottomNavAttrs extends GaAttrs {
 interface GaBottomSheetAttrs extends GaAttrs {
   open?: Bool;
   snap?: "peek" | "half" | "full";
+  /** Paint at `--ga-z-overlay` with a blurred backdrop, over an app's own canvas. */
+  overlay?: Bool;
+  /** The sheet is modal and traps focus by default; `"false"` opts out. */
+  "trap-focus"?: "false" | "true";
 }
 
 interface GaKbdAttrs extends GaAttrs {}
@@ -180,6 +193,45 @@ interface GaKbdAttrs extends GaAttrs {}
 interface GaIconAttrs extends GaAttrs {
   name?: string;
   size?: Numish;
+}
+
+interface GaCheckboxAttrs extends GaAttrs {
+  checked?: Bool;
+  /** The "select all" state over a partial selection; wins over `checked` visually. */
+  indeterminate?: Bool;
+  disabled?: Bool;
+  label?: string;
+  name?: string;
+  /** Submitted when checked; defaults to `"on"` as in the native control. */
+  value?: string;
+}
+
+interface GaFileButtonAttrs extends GaAttrs {
+  accept?: string;
+  multiple?: Bool;
+  label?: string;
+}
+
+interface GaQuantityAttrs extends GaAttrs {
+  value?: Numish;
+  unit?: string;
+  placeholder?: string;
+}
+
+interface GaMetricAttrs extends GaAttrs {
+  label?: string;
+  value?: Numish;
+  unit?: string;
+  placeholder?: string;
+  tone?: "neutral" | "accent" | "ok" | "warn" | "error";
+  /** The lead readout: a larger scale, still aligned with its neighbours. */
+  primary?: Bool;
+}
+
+interface GaStatusAttrs extends GaAttrs {
+  tone?: "neutral" | "ok" | "error";
+  /** Convenience for setting the message without touching light DOM. */
+  text?: string;
 }
 
 declare module "react" {
@@ -208,6 +260,11 @@ declare module "react" {
       "ga-bottom-nav": GaBottomNavAttrs;
       "ga-bottom-sheet": GaBottomSheetAttrs;
       "ga-icon": GaIconAttrs;
+      "ga-checkbox": GaCheckboxAttrs;
+      "ga-file-button": GaFileButtonAttrs;
+      "ga-quantity": GaQuantityAttrs;
+      "ga-metric": GaMetricAttrs;
+      "ga-status": GaStatusAttrs;
     }
   }
 }
