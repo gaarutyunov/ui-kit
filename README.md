@@ -39,8 +39,8 @@ the same kit drops into any stack with no framework-specific adapter:
 `ga-quantity` · `ga-metric` · `ga-note` · `ga-status` · `ga-slider` ·
 `ga-file-drop` · `ga-file-button` · `ga-fab` · `ga-panel` · `ga-header` ·
 `ga-bottom-nav` · `ga-bottom-sheet` · `ga-icon` · `ga-select` ·
-`ga-calendar` · `ga-date-input` · `ga-chart-frame` · `ga-chat` ·
-`ga-chat-message`
+`ga-combobox` · `ga-calendar` · `ga-date-input` · `ga-chart-frame` ·
+`ga-chat` · `ga-chat-message`
 
 Newest additions — the control surface a full-bleed canvas app needs:
 
@@ -59,6 +59,12 @@ Newest additions — the control surface a full-bleed canvas app needs:
   deliberately no row container: the docs page carries the CSS grid recipe.
 - **`ga-status`** — a single-line, tone-coloured status message with
   `role="status"`, so a change is announced. A line, where `ga-alert` is a box.
+- **`ga-combobox`** — a text field with an asynchronous suggestion list, built
+  on `ga-select`'s popup and listbox rather than repeating them. The host owns
+  matching: answer the debounced `filter` event by replacing `options`, and
+  hold `loading` across the round trip. `ga-select` when the answer must come
+  from a known set; `ga-combobox` when the set is too large to ship, comes from
+  a server, or the user may type something that is not in it at all.
 
 Widened in the same pass, all additively — an existing usage renders exactly as
 before: `ga-button` gains `size="icon"` (and warns when an icon button has no

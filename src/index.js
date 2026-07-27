@@ -48,6 +48,7 @@ import "./components/file-button/file-button.js";
 import "./components/quantity/quantity.js";
 import "./components/metric/metric.js";
 import "./components/status/status.js";
+import "./components/combobox/combobox.js";
 
 /* index.d.ts declares a named export per component, so these have to exist at
    runtime too — otherwise `import { GaButton } from "@gaarutyunov/ui-kit"`
@@ -87,3 +88,4 @@ export { GaFileButton } from "./components/file-button/file-button.js";
 export { GaQuantity } from "./components/quantity/quantity.js";
 export { GaMetric } from "./components/metric/metric.js";
 export { GaStatus } from "./components/status/status.js";
+export { GaCombobox } from "./components/combobox/combobox.js";

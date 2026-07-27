@@ -39,6 +39,7 @@ export const NAV = [
       { id: "date-input", label: "Date input" },
       { id: "switch", label: "Switch" },
       { id: "checkbox", label: "Checkbox" },
+      { id: "combobox", label: "Combobox" },
       { id: "spinner", label: "Spinner" },
       { id: "alert", label: "Alert" },
       { id: "kbd", label: "Kbd" },
@@ -530,6 +531,84 @@ export const COMPONENTS = {
       <code>indeterminate</code> attribute could never be expressed in the template.
       Nothing is lost — form participation comes from <code>ElementInternals</code>
       either way, and the button is focusable, in the tab order and toggles on Space.</p>
+    `,
+  },
+
+  combobox: {
+    title: "Combobox",
+    tag: "ga-combobox",
+    lead: "A text field with an asynchronous suggestion list. The host owns matching: answer the debounced filter event by replacing options.",
+    examples: [
+      { title: "Suggestions", code: `<ga-combobox label="City" placeholder="Start typing…"
+  style="max-width:320px; display:block;"
+  options='[{"value":"lis","label":"Lisbon","description":"Portugal"},{"value":"lju","label":"Ljubljana","description":"Slovenia"},{"value":"lim","label":"Lima","description":"Peru"},{"value":"lon","label":"London","description":"United Kingdom"}]'
+  hint="Arrow down to browse, Enter to choose."></ga-combobox>` },
+      { title: "No results, and the pending state", code: `<div style="display:flex; flex-direction:column; gap:20px; max-width:320px;">
+  <ga-combobox label="Nothing matched" value="qqq" options="[]"
+    no-results-text="No city by that name"></ga-combobox>
+
+  <ga-combobox label="While the host fetches" value="lis" loading
+    loading-text="Searching cities…"></ga-combobox>
+</div>` },
+      { title: "Free text and errors", code: `<div style="display:flex; flex-direction:column; gap:20px; max-width:320px;">
+  <ga-combobox label="Tag" placeholder="Anything goes"
+    hint="Not in the list? Type it and press Enter."
+    options='[{"value":"commute","label":"Commute"},{"value":"leisure","label":"Leisure"}]'></ga-combobox>
+
+  <ga-combobox label="Destination" value="Nowhere" required
+    error="Pick a destination from the list"></ga-combobox>
+</div>` },
+    ],
+    api: [
+      { name: "options", type: "JSON", def: "—", desc: "Array of { value, label, description?, disabled? }. Rendered exactly as given — never filtered locally. Falls back to slotted <option>s." },
+      { name: "value", type: "string", def: "—", desc: "The committed value: a chosen suggestion's value, or the typed text." },
+      { name: "loading", type: "boolean", def: "false", desc: "Set while fetching, so the list reads “Searching…” instead of flashing “No results”." },
+      { name: "debounce", type: "number", def: "200", desc: "Milliseconds of quiet before filter fires." },
+      { name: "no-results-text / loading-text", type: "string", def: "No results / Searching…", desc: "The two empty states, for translation." },
+      { name: "placeholder", type: "string", def: "—", desc: "Shown while the field is empty." },
+      { name: "label / hint / error", type: "string", def: "—", desc: "Field chrome, as on ga-input." },
+      { name: "name / required / disabled", type: "—", def: "—", desc: "Form participation." },
+    ],
+    events: [
+      { name: "filter", desc: "Debounced typing — the async hook. detail: { text }. Answer it by replacing options." },
+      { name: "input", desc: "Every keystroke, undebounced. detail: { text }." },
+      { name: "change", desc: "A value was committed, by choosing, Enter or blur. detail: { value, label }." },
+    ],
+    slots: [{ name: "(default)", desc: "<option> elements, a static alternative to the options attribute." }],
+    notes: /* html */ `
+      <p>This is <code>ga-select</code>'s free-text sibling and shares its
+      machinery — the same anchored top-layer popup, the same listbox rows and
+      roving <code>aria-activedescendant</code>. Reach for <code>ga-select</code>
+      when the answer must be one of a known set, and for
+      <code>ga-combobox</code> when the set is too large to ship, comes from a
+      server, or the user may type something that is not in it at all.</p>
+
+      <p><strong>Wiring the async source.</strong> Nothing is filtered locally,
+      and that is the point: a server that answers <code>"sf"</code> with
+      "San Francisco" would have its own result filtered straight back out by a
+      substring pass. Answer <code>filter</code> instead, and hold
+      <code>loading</code> across the round trip so the list says
+      "Searching…" rather than flashing "No results" on every letter:</p>
+      <pre class="code"><code>box.addEventListener("filter", async (e) => {
+  box.loading = true;
+  box.options = await search(e.detail.text);
+  box.loading = false;
+});</code></pre>
+      <p class="muted">New options never re-render the field, so they can land
+      mid-word without disturbing the caret.</p>
+
+      <p><strong>Two values.</strong> Choosing a suggestion puts its
+      <code>label</code> in the field and its <code>value</code> on the element,
+      so an id-backed list keeps its id — <code>change</code> carries both.
+      Typing something that is not in the list commits that text as the value.</p>
+
+      <p><strong>Keyboard.</strong> <ga-kbd>↓</ga-kbd> opens and moves into the
+      list, <ga-kbd>↑</ga-kbd>/<ga-kbd>↓</ga-kbd>/<ga-kbd>Home</ga-kbd>/<ga-kbd>End</ga-kbd>
+      move, <ga-kbd>Enter</ga-kbd> chooses the active suggestion or commits the
+      typed text, and <ga-kbd>Esc</ga-kbd> closes the list — then clears the
+      field if pressed again. <ga-kbd>Tab</ga-kbd> deliberately leaves the text
+      alone: a suggestion merely arrowed past is not the value. Disabled options
+      are skipped by keyboard and pointer alike.</p>
     `,
   },
 

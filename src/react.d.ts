@@ -234,6 +234,26 @@ interface GaStatusAttrs extends GaAttrs {
   text?: string;
 }
 
+interface GaComboboxAttrs extends GaAttrs {
+  /** JSON `{ value, label, description?, disabled? }[]` — supplied by the host, never filtered locally. */
+  options?: string;
+  /** The committed value: a chosen suggestion's `value`, or the typed text. */
+  value?: string;
+  label?: string;
+  placeholder?: string;
+  hint?: string;
+  error?: string;
+  name?: string;
+  /** Milliseconds of quiet before `filter` fires. Default `200`. */
+  debounce?: Numish;
+  "no-results-text"?: string;
+  "loading-text"?: string;
+  /** Set while fetching, so the list says "Searching…" instead of "No results". */
+  loading?: Bool;
+  disabled?: Bool;
+  required?: Bool;
+}
+
 declare module "react" {
   namespace JSX {
     interface IntrinsicElements {
@@ -271,6 +291,7 @@ declare module "react" {
       "ga-quantity": GaQuantityAttrs;
       "ga-metric": GaMetricAttrs;
       "ga-status": GaStatusAttrs;
+      "ga-combobox": GaComboboxAttrs;
     }
   }
 }
