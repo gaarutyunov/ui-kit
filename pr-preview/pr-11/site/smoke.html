@@ -8,7 +8,11 @@
 <p style="font-size:13px;color:var(--ga-muted);max-width:60ch;">
   Behavioural checks for the components added in
   <a href="https://github.com/gaarutyunov/ui-kit/issues/6">#6</a> — roles, keyboard
-  paths, date parsing, scroll-follow and the theme tokens. The kit has no test
+  paths, date parsing, scroll-follow and the theme tokens — plus the review
+  components from <a href="https://github.com/gaarutyunov/ui-kit/issues/10">#10</a>:
+  the comment thread's deliberate <em>lack</em> of scroll-follow, the splitter's
+  keyboard bounds, and the <code>ga-chat-message</code> <code>role</code> →
+  <code>from</code> rename. The kit has no test
   runner by design, so this is a page you open: <code>npm run dev</code>, then
   <code>/site/smoke.html</code>. The summary below says PASS or FAIL per check;
   the tab title carries the total.
@@ -17,6 +21,11 @@
 <pre id="out" style="font-size:12px;line-height:1.7;white-space:pre-wrap;"></pre>
 <script type="module">
 import "../src/index.js";
+// #10's components are registered by section 8, not yet by src/index.js, so
+// their modules are imported directly here.
+import "../src/components/comment/comment.js";
+import "../src/components/comment-thread/comment-thread.js";
+import "../src/components/splitter/splitter.js";
 
 const results = [];
 const ok = (name, cond, extra = "") =>
@@ -31,13 +40,24 @@ function mount(html) {
   return stage.firstElementChild;
 }
 
+/** getComputedStyle reports colours as rgb(); the tokens are written as hex. */
+const hexToRgb = (hex) => {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
+  if (!m) return hex;
+  const n = parseInt(m[1], 16);
+  return `rgb(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255})`;
+};
+
 await customElements.whenDefined("ga-select");
 await customElements.whenDefined("ga-calendar");
 await customElements.whenDefined("ga-date-input");
 await customElements.whenDefined("ga-chart-frame");
 await customElements.whenDefined("ga-chat");
 await customElements.whenDefined("ga-chat-message");
-ok("all six elements registered", true);
+await customElements.whenDefined("ga-comment");
+await customElements.whenDefined("ga-comment-thread");
+await customElements.whenDefined("ga-splitter");
+ok("all nine elements registered", true);
 
 /* ---- ga-select ------------------------------------------------------- */
 const sel = mount(`<ga-select label="Unit" value="kg"
@@ -166,8 +186,8 @@ ok("chart-frame: empty state", cfEmpty.shadowRoot.querySelector(".state")?.textC
 
 /* ---- ga-chat --------------------------------------------------------- */
 const chat = mount(`<ga-chat height="120px">
-  <ga-chat-message role="user">One</ga-chat-message>
-  <ga-chat-message role="assistant">Two</ga-chat-message>
+  <ga-chat-message from="user">One</ga-chat-message>
+  <ga-chat-message from="assistant">Two</ga-chat-message>
 </ga-chat>`);
 await frame();
 const log = chat.shadowRoot.querySelector(".log");
@@ -179,7 +199,7 @@ ok("chat: jump button hidden while following",
 
 // Scroll up: following stops and the jump affordance appears.
 for (let i = 0; i < 12; i++) {
-  chat.insertAdjacentHTML("beforeend", `<ga-chat-message role="assistant">Filler ${i}</ga-chat-message>`);
+  chat.insertAdjacentHTML("beforeend", `<ga-chat-message from="assistant">Filler ${i}</ga-chat-message>`);
 }
 await frame();
 // .log sets scroll-behavior: smooth, so assigning scrollTop animates and the
@@ -206,14 +226,316 @@ await frame();
 ok("chat: empty state shown with no messages",
    empty.shadowRoot.querySelector(".placeholder").hidden === false);
 
-const streaming = mount(`<ga-chat-message role="assistant" state="streaming">Partial</ga-chat-message>`);
+const streaming = mount(`<ga-chat-message from="assistant" state="streaming">Partial</ga-chat-message>`);
 await frame();
 ok("chat-message: streaming turn is a live region",
    streaming.shadowRoot.querySelector(".bubble").getAttribute("aria-live") === "polite");
-const errored = mount(`<ga-chat-message role="assistant" state="error">Nope</ga-chat-message>`);
+const errored = mount(`<ga-chat-message from="assistant" state="error">Nope</ga-chat-message>`);
 await frame();
 ok("chat-message: error turn is an alert",
    errored.shadowRoot.querySelector(".bubble").getAttribute("role") === "alert");
+
+/* ---- ga-chat-message: `role` -> `from` (#10, breaking) ---------------- *
+ * The rename must change the attribute name and nothing else, so these
+ * re-assert the *rendered* behaviour under the new spelling. */
+const userTurn = mount(`<ga-chat-message from="user" author="You">Mine</ga-chat-message>`);
+await frame();
+ok("chat-message: host carries no ARIA role of its own",
+   userTurn.hasAttribute("role") === false);
+ok("chat-message: from=user still aligns to the end",
+   getComputedStyle(userTurn.shadowRoot.querySelector(".row")).alignItems === "flex-end");
+{
+  const bubble = getComputedStyle(userTurn.shadowRoot.querySelector(".bubble"));
+  const fg = getComputedStyle(document.documentElement).getPropertyValue("--ga-fg").trim();
+  ok("chat-message: from=user still gets the inverse fill",
+     bubble.backgroundColor === hexToRgb(fg), `${bubble.backgroundColor} vs ${fg}`);
+}
+const otherTurn = mount(`<ga-chat-message from="assistant">Theirs</ga-chat-message>`);
+await frame();
+ok("chat-message: from=assistant still aligns to the start",
+   getComputedStyle(otherTurn.shadowRoot.querySelector(".row")).alignItems !== "flex-end");
+const sysTurn = mount(`<ga-chat-message from="system">Session started</ga-chat-message>`);
+await frame();
+ok("chat-message: from=system is still a note",
+   sysTurn.shadowRoot.querySelector(".bubble").getAttribute("role") === "note");
+const pendingTurn = mount(`<ga-chat-message from="assistant" state="pending"></ga-chat-message>`);
+await frame();
+ok("chat-message: the status line still names the speaker",
+   pendingTurn.shadowRoot.querySelector("#status")?.textContent.includes("Assistant"),
+   pendingTurn.shadowRoot.querySelector("#status")?.textContent);
+const staleTurn = mount(`<ga-chat-message role="user">Old spelling</ga-chat-message>`);
+await frame();
+ok("chat-message: the old spelling no longer aligns (the break is real)",
+   getComputedStyle(staleTurn.shadowRoot.querySelector(".row")).alignItems !== "flex-end");
+
+/* ---- ga-comment ------------------------------------------------------- */
+const c1 = mount(`<ga-comment author="Ada" time="2h ago" datetime="2026-07-28T09:12:00Z"
+  anchor="step 3 · Submit the order">The retry fires early.</ga-comment>`);
+await frame();
+ok("comment: renders the author", c1.shadowRoot.querySelector(".author")?.textContent === "Ada");
+ok("comment: the timestamp is machine-readable too",
+   c1.shadowRoot.querySelector("time")?.getAttribute("datetime") === "2026-07-28T09:12:00Z");
+ok("comment: shows its anchor",
+   c1.shadowRoot.querySelector(".anchor")?.textContent.includes("Submit the order"));
+ok("comment: unresolved has no Resolved chip", !c1.shadowRoot.querySelector(".chip"));
+
+let resolveDetail = null;
+c1.addEventListener("resolve", (e) => { resolveDetail = e.detail; });
+c1.shadowRoot.querySelector(".toggle").click();
+await frame();
+ok("comment: the toggle emits the NEW state", resolveDetail?.resolved === true, JSON.stringify(resolveDetail));
+ok("comment: resolving is reflected", c1.hasAttribute("resolved"));
+ok("comment: resolved state reaches AT as text, not only opacity",
+   c1.shadowRoot.querySelector(".chip")?.textContent.trim() === "Resolved");
+ok("comment: the toggle reports the state",
+   c1.shadowRoot.querySelector(".toggle").getAttribute("aria-pressed") === "true");
+ok("comment: and offers the reverse",
+   c1.shadowRoot.querySelector(".toggle").textContent.trim() === "Reopen");
+c1.shadowRoot.querySelector(".toggle").click();
+await frame();
+ok("comment: reopening emits it too", resolveDetail?.resolved === false && !c1.hasAttribute("resolved"));
+
+// Uniform alignment: two different authors, byte-identical box treatment.
+{
+  const pair = mount(`<div><ga-comment author="Ada">a</ga-comment><ga-comment author="Grace">b</ga-comment></div>`);
+  await frame();
+  const [a, b] = [...pair.children].map((el) => getComputedStyle(el.shadowRoot.querySelector(".card")));
+  ok("comment: every author gets the identical card",
+     a.backgroundColor === b.backgroundColor && a.textAlign === b.textAlign &&
+     a.marginLeft === b.marginLeft && a.marginRight === b.marginRight,
+     `${a.backgroundColor}/${b.backgroundColor}`);
+}
+
+/* ---- ga-comment-thread ------------------------------------------------ */
+const emptyThread = mount(`<ga-comment-thread empty-text="Nothing yet"></ga-comment-thread>`);
+await frame();
+ok("thread: empty state shown", emptyThread.shadowRoot.querySelector(".empty").hidden === false);
+ok("thread: ...and the composer is still there",
+   Boolean(emptyThread.shadowRoot.querySelector("textarea")));
+
+const thread = mount(`<ga-comment-thread anchor="step 3" height="140px">
+  <ga-comment author="Ada" time="2h">one</ga-comment>
+  <ga-comment author="Grace" time="1h">two</ga-comment>
+</ga-comment-thread>`);
+await frame();
+const list = thread.shadowRoot.querySelector(".list");
+ok("thread: it is a list", list?.getAttribute("role") === "list");
+ok("thread: it is NOT a live log",
+   thread.shadowRoot.querySelectorAll("[aria-live], [role='log']").length === 0);
+ok("thread: slotted comments expose themselves as list items",
+   [...thread.children].every((el) => el.getAttribute("role") === "listitem"));
+ok("thread: empty state hidden when there are comments",
+   thread.shadowRoot.querySelector(".empty").hidden === true);
+ok("thread: the composer comes before the list",
+   thread.shadowRoot.querySelector(".composer").compareDocumentPosition(list) &
+     Node.DOCUMENT_POSITION_FOLLOWING ? true : false);
+ok("thread: the composer states its target",
+   thread.shadowRoot.querySelector(".target").textContent.includes("step 3"));
+
+const area = thread.shadowRoot.querySelector("textarea");
+const submitBtn = thread.shadowRoot.querySelector(".submit");
+ok("thread: submit is disabled with an empty draft", submitBtn.disabled === true);
+area.value = "  ";
+area.dispatchEvent(new Event("input"));
+await frame();
+ok("thread: whitespace is not a comment", submitBtn.disabled === true);
+
+let posted = null;
+let postedCount = 0;
+thread.addEventListener("comment", (e) => { posted = e.detail; postedCount++; });
+area.value = "Needs a retry guard";
+area.dispatchEvent(new Event("input"));
+await frame();
+ok("thread: submit enables with a draft", submitBtn.disabled === false);
+submitBtn.click();
+await frame();
+ok("thread: submitting emits the text", posted?.value === "Needs a retry guard", JSON.stringify(posted));
+ok("thread: ...carrying the anchor", posted?.anchor === "step 3");
+ok("thread: ...and does NOT clear until the host accepts",
+   thread.shadowRoot.querySelector("textarea").value === "Needs a retry guard");
+
+area.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", metaKey: true, bubbles: true }));
+await frame();
+ok("thread: Cmd+Enter submits", postedCount === 2, `n=${postedCount}`);
+area.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", ctrlKey: true, bubbles: true }));
+await frame();
+ok("thread: Ctrl+Enter submits too", postedCount === 3, `n=${postedCount}`);
+area.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+await frame();
+ok("thread: a bare Enter does not submit", postedCount === 3, `n=${postedCount}`);
+
+thread.accept();
+await frame();
+ok("thread: accept() is what clears it",
+   thread.shadowRoot.querySelector("textarea").value === "" && submitBtn.disabled === true);
+
+// The headline behaviour: a comment arriving must not move the reader.
+{
+  for (let i = 0; i < 10; i++) {
+    thread.insertAdjacentHTML("beforeend",
+      `<ga-comment author="Bot" time="0m">filler ${i}</ga-comment>`);
+  }
+  await frame();
+  const scrollable = list.scrollHeight > list.clientHeight;
+  list.scrollTop = 40;
+  await frame();
+  const before = list.scrollTop;
+  thread.insertAdjacentHTML("beforeend", `<ga-comment author="Ada" time="now">new</ga-comment>`);
+  await frame();
+  await frame();
+  ok("thread: the list actually scrolls (layout ran)", scrollable,
+     `scrollHeight=${list.scrollHeight} clientHeight=${list.clientHeight}`);
+  ok("thread: adding a comment does NOT move the scroll position",
+     list.scrollTop === before, `before=${before} after=${list.scrollTop}`);
+  ok("thread: the new comment is still exposed as a list item",
+     thread.lastElementChild.getAttribute("role") === "listitem");
+}
+// ...and a host-driven re-render puts the reader back where they were.
+{
+  const before = list.scrollTop;
+  thread.setAttribute("error", "Could not save that comment.");
+  await frame();
+  const list2 = thread.shadowRoot.querySelector(".list");
+  ok("thread: an attribute re-render restores the scroll position",
+     list2.scrollTop === before, `before=${before} after=${list2.scrollTop}`);
+  ok("thread: the host's error is shown",
+     thread.shadowRoot.querySelector(".error")?.textContent.includes("Could not save"));
+}
+{
+  const t2 = mount(`<ga-comment-thread></ga-comment-thread>`);
+  await frame();
+  const a2 = t2.shadowRoot.querySelector("textarea");
+  a2.value = "half written";
+  a2.dispatchEvent(new Event("input"));
+  t2.setAttribute("busy", "");
+  await frame();
+  ok("thread: a re-render keeps the half-written draft",
+     t2.shadowRoot.querySelector("textarea").value === "half written");
+  ok("thread: busy locks the composer",
+     t2.shadowRoot.querySelector("textarea").disabled === true &&
+     t2.shadowRoot.querySelector(".submit").disabled === true);
+}
+
+/* ---- ga-splitter ------------------------------------------------------ */
+const pane = mount(`<div style="display:grid;grid-template-columns:var(--ga-split) auto 1fr;width:400px;height:80px;">
+  <section>left</section>
+  <ga-splitter value="50" min="20" max="80"></ga-splitter>
+  <section>right</section>
+</div>`);
+await frame();
+const splitter = pane.querySelector("ga-splitter");
+const handle = splitter.shadowRoot.querySelector(".handle");
+ok("splitter: announces itself as a separator", handle.getAttribute("role") === "separator");
+ok("splitter: with its current and permitted values",
+   handle.getAttribute("aria-valuenow") === "50" &&
+   handle.getAttribute("aria-valuemin") === "20" &&
+   handle.getAttribute("aria-valuemax") === "80");
+ok("splitter: and its orientation", handle.getAttribute("aria-orientation") === "vertical");
+ok("splitter: a single tab stop", handle.getAttribute("tabindex") === "0" &&
+   splitter.shadowRoot.querySelectorAll('[tabindex="0"]').length === 1);
+ok("splitter: publishes its position as a custom property on the parent",
+   pane.style.getPropertyValue("--ga-split") === "50%", pane.style.getPropertyValue("--ga-split"));
+ok("splitter: which the app's own grid resolves",
+   getComputedStyle(pane).gridTemplateColumns.split(" ").length === 3,
+   getComputedStyle(pane).gridTemplateColumns);
+ok("splitter: owns no layout — it has no slot for the regions",
+   splitter.shadowRoot.querySelectorAll("slot").length === 0);
+
+let splitEvents = { input: 0, change: 0 };
+splitter.addEventListener("input", () => splitEvents.input++);
+splitter.addEventListener("change", () => splitEvents.change++);
+const key = (k, opts = {}) =>
+  handle.dispatchEvent(new KeyboardEvent("keydown", { key: k, bubbles: true, cancelable: true, ...opts }));
+
+key("ArrowRight");
+await frame();
+ok("splitter: an arrow steps it", splitter.getAttribute("value") === "51", splitter.getAttribute("value"));
+key("ArrowLeft"); key("ArrowLeft");
+await frame();
+ok("splitter: and back the other way", splitter.getAttribute("value") === "49");
+key("Home");
+await frame();
+ok("splitter: Home goes to the minimum", splitter.getAttribute("value") === "20");
+key("ArrowLeft");
+await frame();
+ok("splitter: and is clamped there", splitter.getAttribute("value") === "20");
+key("End");
+await frame();
+ok("splitter: End goes to the maximum", splitter.getAttribute("value") === "80");
+key("ArrowRight");
+await frame();
+ok("splitter: and is clamped there too", splitter.getAttribute("value") === "80");
+ok("splitter: the custom property followed the keyboard",
+   pane.style.getPropertyValue("--ga-split") === "80%", pane.style.getPropertyValue("--ga-split"));
+ok("splitter: every move reports itself", splitEvents.input >= 7 && splitEvents.change >= 7,
+   JSON.stringify(splitEvents));
+{
+  const tab = new KeyboardEvent("keydown", { key: "Tab", bubbles: true, cancelable: true });
+  handle.dispatchEvent(tab);
+  ok("splitter: it does not eat Tab", tab.defaultPrevented === false);
+}
+{
+  const step = mount(`<div style="width:400px"><ga-splitter value="50" step="5"></ga-splitter></div>`)
+    .querySelector("ga-splitter");
+  await frame();
+  step.shadowRoot.querySelector(".handle")
+    .dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+  await frame();
+  ok("splitter: the step is configurable", step.getAttribute("value") === "55", step.getAttribute("value"));
+}
+{
+  // Number("") is 0, not NaN: an unset `max` must fall back to 100 rather than
+  // collapsing to zero and pinning the splitter shut.
+  const bare = mount(`<div style="width:400px"><ga-splitter></ga-splitter></div>`)
+    .querySelector("ga-splitter");
+  await frame();
+  const h = bare.shadowRoot.querySelector(".handle");
+  ok("splitter: unset bounds default to 0..100",
+     h.getAttribute("aria-valuemin") === "0" && h.getAttribute("aria-valuemax") === "100" &&
+     h.getAttribute("aria-valuenow") === "50",
+     `${h.getAttribute("aria-valuemin")}..${h.getAttribute("aria-valuemax")} now=${h.getAttribute("aria-valuenow")}`);
+}
+{
+  // Drag: pointerdown then a pointermove whose coordinates are far outside the
+  // 11px handle. Real pointer capture is what routes that move back here in a
+  // browser; this asserts the arithmetic and that leaving the box is handled.
+  const box = mount(`<div style="width:400px;height:80px;position:relative;"><ga-splitter value="50" min="10" max="90"></ga-splitter></div>`);
+  const drag = box.querySelector("ga-splitter");
+  await frame();
+  const dh = drag.shadowRoot.querySelector(".handle");
+  const rect = box.getBoundingClientRect();
+  const pe = (type, x) => new PointerEvent(type, {
+    pointerId: 7, bubbles: true, cancelable: true, clientX: x, clientY: rect.top + 200,
+  });
+  dh.dispatchEvent(pe("pointerdown", rect.left + 100));
+  await frame();
+  ok("splitter: a press seeks to the pointer", drag.getAttribute("value") === "25",
+     drag.getAttribute("value"));
+  ok("splitter: the handle marks itself as dragging", dh.hasAttribute("data-dragging"));
+  // 900px to the right of the box, and 200px below it.
+  dh.dispatchEvent(pe("pointermove", rect.left + 1300));
+  await frame();
+  ok("splitter: a move far outside the element still tracks, clamped to max",
+     drag.getAttribute("value") === "90", drag.getAttribute("value"));
+  dh.dispatchEvent(pe("pointermove", rect.left - 500));
+  await frame();
+  ok("splitter: ...and clamped to min on the other side",
+     drag.getAttribute("value") === "10", drag.getAttribute("value"));
+  dh.dispatchEvent(pe("pointerup", rect.left + 200));
+  await frame();
+  ok("splitter: release ends the drag", !dh.hasAttribute("data-dragging"));
+  dh.dispatchEvent(pe("pointermove", rect.left + 380));
+  await frame();
+  ok("splitter: and a move after release is ignored", drag.getAttribute("value") === "50",
+     drag.getAttribute("value"));
+}
+{
+  const horiz = mount(`<div style="height:200px"><ga-splitter orientation="horizontal" value="50"></ga-splitter></div>`)
+    .querySelector("ga-splitter");
+  await frame();
+  ok("splitter: a horizontal one says so",
+     horiz.shadowRoot.querySelector(".handle").getAttribute("aria-orientation") === "horizontal");
+}
 
 /* ---- themes ---------------------------------------------------------- */
 for (const theme of ["dark", "light"]) {
