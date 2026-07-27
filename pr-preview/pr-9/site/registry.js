@@ -34,8 +34,12 @@ export const NAV = [
       { id: "card", label: "Card" },
       { id: "avatar", label: "Avatar" },
       { id: "input", label: "Input" },
+      { id: "select", label: "Select" },
+      { id: "calendar", label: "Calendar" },
+      { id: "date-input", label: "Date input" },
       { id: "switch", label: "Switch" },
       { id: "checkbox", label: "Checkbox" },
+      { id: "combobox", label: "Combobox" },
       { id: "spinner", label: "Spinner" },
       { id: "alert", label: "Alert" },
       { id: "kbd", label: "Kbd" },
@@ -55,6 +59,8 @@ export const NAV = [
       { id: "header", label: "Header" },
       { id: "bottom-nav", label: "Bottom nav" },
       { id: "bottom-sheet", label: "Bottom sheet" },
+      { id: "chart-frame", label: "Chart frame" },
+      { id: "chat", label: "Chat" },
     ],
   },
 ];
@@ -525,6 +531,84 @@ export const COMPONENTS = {
       <code>indeterminate</code> attribute could never be expressed in the template.
       Nothing is lost — form participation comes from <code>ElementInternals</code>
       either way, and the button is focusable, in the tab order and toggles on Space.</p>
+    `,
+  },
+
+  combobox: {
+    title: "Combobox",
+    tag: "ga-combobox",
+    lead: "A text field with an asynchronous suggestion list. The host owns matching: answer the debounced filter event by replacing options.",
+    examples: [
+      { title: "Suggestions", code: `<ga-combobox label="City" placeholder="Start typing…"
+  style="max-width:320px; display:block;"
+  options='[{"value":"lis","label":"Lisbon","description":"Portugal"},{"value":"lju","label":"Ljubljana","description":"Slovenia"},{"value":"lim","label":"Lima","description":"Peru"},{"value":"lon","label":"London","description":"United Kingdom"}]'
+  hint="Arrow down to browse, Enter to choose."></ga-combobox>` },
+      { title: "No results, and the pending state", code: `<div style="display:flex; flex-direction:column; gap:20px; max-width:320px;">
+  <ga-combobox label="Nothing matched" value="qqq" options="[]"
+    no-results-text="No city by that name"></ga-combobox>
+
+  <ga-combobox label="While the host fetches" value="lis" loading
+    loading-text="Searching cities…"></ga-combobox>
+</div>` },
+      { title: "Free text and errors", code: `<div style="display:flex; flex-direction:column; gap:20px; max-width:320px;">
+  <ga-combobox label="Tag" placeholder="Anything goes"
+    hint="Not in the list? Type it and press Enter."
+    options='[{"value":"commute","label":"Commute"},{"value":"leisure","label":"Leisure"}]'></ga-combobox>
+
+  <ga-combobox label="Destination" value="Nowhere" required
+    error="Pick a destination from the list"></ga-combobox>
+</div>` },
+    ],
+    api: [
+      { name: "options", type: "JSON", def: "—", desc: "Array of { value, label, description?, disabled? }. Rendered exactly as given — never filtered locally. Falls back to slotted <option>s." },
+      { name: "value", type: "string", def: "—", desc: "The committed value: a chosen suggestion's value, or the typed text." },
+      { name: "loading", type: "boolean", def: "false", desc: "Set while fetching, so the list reads “Searching…” instead of flashing “No results”." },
+      { name: "debounce", type: "number", def: "200", desc: "Milliseconds of quiet before filter fires." },
+      { name: "no-results-text / loading-text", type: "string", def: "No results / Searching…", desc: "The two empty states, for translation." },
+      { name: "placeholder", type: "string", def: "—", desc: "Shown while the field is empty." },
+      { name: "label / hint / error", type: "string", def: "—", desc: "Field chrome, as on ga-input." },
+      { name: "name / required / disabled", type: "—", def: "—", desc: "Form participation." },
+    ],
+    events: [
+      { name: "filter", desc: "Debounced typing — the async hook. detail: { text }. Answer it by replacing options." },
+      { name: "input", desc: "Every keystroke, undebounced. detail: { text }." },
+      { name: "change", desc: "A value was committed, by choosing, Enter or blur. detail: { value, label }." },
+    ],
+    slots: [{ name: "(default)", desc: "<option> elements, a static alternative to the options attribute." }],
+    notes: /* html */ `
+      <p>This is <code>ga-select</code>'s free-text sibling and shares its
+      machinery — the same anchored top-layer popup, the same listbox rows and
+      roving <code>aria-activedescendant</code>. Reach for <code>ga-select</code>
+      when the answer must be one of a known set, and for
+      <code>ga-combobox</code> when the set is too large to ship, comes from a
+      server, or the user may type something that is not in it at all.</p>
+
+      <p><strong>Wiring the async source.</strong> Nothing is filtered locally,
+      and that is the point: a server that answers <code>"sf"</code> with
+      "San Francisco" would have its own result filtered straight back out by a
+      substring pass. Answer <code>filter</code> instead, and hold
+      <code>loading</code> across the round trip so the list says
+      "Searching…" rather than flashing "No results" on every letter:</p>
+      <pre class="code"><code>box.addEventListener("filter", async (e) => {
+  box.loading = true;
+  box.options = await search(e.detail.text);
+  box.loading = false;
+});</code></pre>
+      <p class="muted">New options never re-render the field, so they can land
+      mid-word without disturbing the caret.</p>
+
+      <p><strong>Two values.</strong> Choosing a suggestion puts its
+      <code>label</code> in the field and its <code>value</code> on the element,
+      so an id-backed list keeps its id — <code>change</code> carries both.
+      Typing something that is not in the list commits that text as the value.</p>
+
+      <p><strong>Keyboard.</strong> <ga-kbd>↓</ga-kbd> opens and moves into the
+      list, <ga-kbd>↑</ga-kbd>/<ga-kbd>↓</ga-kbd>/<ga-kbd>Home</ga-kbd>/<ga-kbd>End</ga-kbd>
+      move, <ga-kbd>Enter</ga-kbd> chooses the active suggestion or commits the
+      typed text, and <ga-kbd>Esc</ga-kbd> closes the list — then clears the
+      field if pressed again. <ga-kbd>Tab</ga-kbd> deliberately leaves the text
+      alone: a suggestion merely arrowed past is not the value. Disabled options
+      are skipped by keyboard and pointer alike.</p>
     `,
   },
 
@@ -1266,6 +1350,163 @@ swap();</code></pre>
       keyboard; a sheet is modal and must.</p>
     `,
   },
+
+  select: {
+    title: "Select",
+    tag: "ga-select",
+    lead: "A listbox select. Form-associated, optionally filterable, optionally multi-select. Options come from a JSON attribute or from slotted <option> children.",
+    examples: [
+      { title: "Default", code: `<div style="display:flex; flex-direction:column; gap:20px; max-width:320px;">
+  <ga-select label="Unit" value="kg"
+    options='[{"value":"kg","label":"Kilograms"},{"value":"lb","label":"Pounds"}]'></ga-select>
+
+  <ga-select label="Exercise" placeholder="Pick one" filterable
+    options='[{"value":"squat","label":"Back squat"},{"value":"bench","label":"Bench press"},{"value":"dead","label":"Deadlift"},{"value":"ohp","label":"Overhead press"},{"value":"row","label":"Barbell row"}]'></ga-select>
+
+  <ga-select label="Muscle groups" multiple placeholder="Any"
+    options='[{"value":"chest","label":"Chest"},{"value":"back","label":"Back"},{"value":"legs","label":"Legs"},{"value":"arms","label":"Arms","disabled":true}]'></ga-select>
+</div>` },
+      { title: "From slotted options", code: `<ga-select label="Split" style="max-width:320px; display:block;">
+  <option value="ppl">Push / Pull / Legs</option>
+  <option value="ul" selected>Upper / Lower</option>
+  <option value="fb">Full body</option>
+</ga-select>` },
+    ],
+    api: [
+      { name: "options", type: "JSON", def: "—", desc: "Array of { value, label, disabled? }. Falls back to slotted <option>s." },
+      { name: "value", type: "string", def: "—", desc: "Selected value; comma-separated when multiple." },
+      { name: "multiple", type: "boolean", def: "false", desc: "Toggle selection without closing; the trigger summarises as “N selected”." },
+      { name: "filterable", type: "boolean", def: "false", desc: "Show a filter field in the popup." },
+      { name: "placeholder", type: "string", def: "Select…", desc: "Shown when nothing is selected." },
+      { name: "label / hint / error", type: "string", def: "—", desc: "Field chrome, as on ga-input." },
+      { name: "name / required / disabled", type: "—", def: "—", desc: "Form participation." },
+    ],
+    events: [
+      { name: "change", desc: "Selection committed. detail: { value } — an array when multiple." },
+      { name: "input", desc: "Same payload, fired alongside change." },
+      { name: "filter", desc: "Debounced typing in the filter field. detail: { text }. Replace `options` yourself to drive an async source." },
+    ],
+    slots: [{ name: "(default)", desc: "<option> elements, an alternative to the options attribute." }],
+    notes: "Keyboard: Enter/Space/Alt+Down opens, Up/Down/Home/End/PageUp/PageDown move, type-ahead jumps, Escape closes, Tab commits and moves on. Disabled options are skipped by both keyboard and pointer.",
+  },
+
+  calendar: {
+    title: "Calendar",
+    tag: "ga-calendar",
+    lead: "A month grid for picking one date. Values are YYYY-MM-DD strings — never Date objects, so no timezone can shift the day.",
+    examples: [
+      { title: "Default", code: `<ga-calendar value="2026-03-14"></ga-calendar>` },
+      { title: "Bounded range", code: `<ga-calendar value="2026-03-14" min="2026-03-02" max="2026-03-24"></ga-calendar>` },
+      { title: "Locale and first day", code: `<ga-calendar value="2026-03-14" locale="de-DE" first-day="1"></ga-calendar>` },
+    ],
+    api: [
+      { name: "value", type: "YYYY-MM-DD", def: "—", desc: "Selected date." },
+      { name: "month", type: "YYYY-MM", def: "value’s month", desc: "The month on display." },
+      { name: "locale", type: "string", def: "browser", desc: "Passed to Intl for month and weekday names." },
+      { name: "first-day", type: "0–6", def: "1", desc: "0 = Sunday. Default is Monday." },
+      { name: "min / max", type: "YYYY-MM-DD", def: "—", desc: "Selectable range; days outside are disabled." },
+      { name: "disabled", type: "boolean", def: "false", desc: "Disable the whole grid." },
+    ],
+    events: [{ name: "change", desc: "A day was chosen. detail: { value } as YYYY-MM-DD." }],
+    notes: "role=grid with a roving tabindex: arrows move by day, Home/End to the week’s ends, PageUp/PageDown by month (clamped, so 31 Mar + 1 month is 30 Apr). Crossing a month boundary flips the grid and keeps focus on the day.",
+  },
+
+  "date-input": {
+    title: "Date input",
+    tag: "ga-date-input",
+    lead: "A text field with a calendar picker. Form-associated; the submitted value is always YYYY-MM-DD.",
+    examples: [
+      { title: "Default", code: `<div style="display:flex; flex-direction:column; gap:20px; max-width:320px;">
+  <ga-date-input label="Session date" value="2026-03-14"></ga-date-input>
+  <ga-date-input label="With a range" value="2026-03-14" min="2026-03-01" max="2026-03-31"
+    hint="March only"></ga-date-input>
+</div>` },
+    ],
+    api: [
+      { name: "value", type: "YYYY-MM-DD", def: "—", desc: "The date, and what the form submits." },
+      { name: "min / max", type: "YYYY-MM-DD", def: "—", desc: "Accepted range; outside it the field shows an error and keeps the old value." },
+      { name: "locale / first-day", type: "—", def: "—", desc: "Passed through to the calendar." },
+      { name: "label / hint / error / placeholder", type: "string", def: "—", desc: "Field chrome. The placeholder defaults to the locale’s own pattern." },
+      { name: "name / required / disabled", type: "—", def: "—", desc: "Form participation." },
+    ],
+    events: [
+      { name: "change", desc: "A date was committed, by typing or by picking. detail: { value }." },
+      { name: "input", desc: "Fires while typing. detail: { value } — the raw text until it parses." },
+    ],
+    notes: "Typing is lenient: ISO always parses, and the locale’s own numeric order is read out of Intl rather than assumed — 14/03/2026 is day-first in en-GB and nonsense in en-US, and only the locale knows which. Anything unparseable, or a real date outside min/max, flags the field instead of silently becoming a different date.",
+  },
+
+  "chart-frame": {
+    title: "Chart frame",
+    tag: "ga-chart-frame",
+    lead: "The furniture around a chart — title, legend, loading and empty states, responsive plot area. It draws no data: slot in an <svg>, a canvas, or a charting library’s node, and take the series colours from the --ga-chart-* tokens.",
+    examples: [
+      { title: "With a plot", code: `<ga-chart-frame title="Volume by week" height="160px"
+  legend='[{"label":"Squat"},{"label":"Bench"}]' style="max-width:520px; display:block;">
+  <svg viewBox="0 0 400 160" preserveAspectRatio="none" aria-label="Volume by week">
+    <polyline fill="none" stroke="var(--ga-chart-1)" stroke-width="2"
+      points="0,130 80,110 160,84 240,70 320,48 400,36"></polyline>
+    <polyline fill="none" stroke="var(--ga-chart-2)" stroke-width="2"
+      points="0,140 80,132 160,126 240,112 320,108 400,96"></polyline>
+  </svg>
+  <span slot="footer">Last six weeks.</span>
+</ga-chart-frame>` },
+      { title: "Loading and empty", code: `<div style="display:grid; gap:16px; grid-template-columns:1fr 1fr;">
+  <ga-chart-frame title="Loading" height="120px" loading></ga-chart-frame>
+  <ga-chart-frame title="Empty" height="120px" empty empty-text="No sessions yet"></ga-chart-frame>
+</div>` },
+    ],
+    api: [
+      { name: "title", type: "string", def: "—", desc: "Caption above the plot." },
+      { name: "legend", type: "JSON", def: "—", desc: "Array of { label, color? }. Swatches take --ga-chart-1…8 in series order." },
+      { name: "height", type: "CSS length", def: "180px", desc: "Minimum plot height." },
+      { name: "loading / empty", type: "boolean", def: "false", desc: "Overlay a status in the plot area." },
+      { name: "empty-text", type: "string", def: "No data", desc: "Message for the empty state." },
+    ],
+    slots: [
+      { name: "(default)", desc: "The plot itself." },
+      { name: "footer", desc: "A caption or axis note." },
+    ],
+    notes: "The eight-series palette is colour-blind-safe by default, not as an opt-in variant. The order was picked by simulating deuteranopia and protanopia over the swatches and measuring CIEDE2000 between every pair, so the earliest tokens are the most separable: ΔE 53.6 at two series, 26.9 at three, 6.9 at six. Past six, distinguish by more than colour.",
+  },
+
+  chat: {
+    title: "Chat",
+    tag: "ga-chat",
+    lead: "A scrollable transcript with a header, a composer footer, and scroll-follow that stops when you scroll up. Messages are <ga-chat-message> children.",
+    examples: [
+      { title: "Transcript", code: `<ga-chat height="260px" style="max-width:520px;">
+  <span slot="header">Coach</span>
+  <ga-chat-message role="user" author="You" time="09:12">Log 3x5 at 100kg</ga-chat-message>
+  <ga-chat-message role="assistant" author="Coach" time="09:12">Logged — that is a 2.5kg jump on last week.</ga-chat-message>
+  <ga-chat-message role="assistant" state="pending"></ga-chat-message>
+  <div slot="footer" style="display:flex; gap:8px;">
+    <ga-input placeholder="Message…" style="flex:1;"></ga-input>
+    <ga-button>Send</ga-button>
+  </div>
+</ga-chat>` },
+      { title: "Message states", code: `<div style="display:flex; flex-direction:column; gap:12px; max-width:420px;">
+  <ga-chat-message role="user">A sent turn.</ga-chat-message>
+  <ga-chat-message role="assistant" state="streaming">A turn still arriving</ga-chat-message>
+  <ga-chat-message role="assistant" state="error">Could not reach the model.</ga-chat-message>
+  <ga-chat-message role="system">Session started</ga-chat-message>
+</div>` },
+    ],
+    api: [
+      { name: "height", type: "CSS length", def: "360px", desc: "Height of the scrolling transcript." },
+      { name: "empty-text", type: "string", def: "No messages yet.", desc: "Shown when there are no messages." },
+      { name: "role (message)", type: "user | assistant | system", def: "assistant", desc: "Alignment and treatment of a ga-chat-message." },
+      { name: "state (message)", type: "sent | pending | streaming | error", def: "sent", desc: "Whether the turn is settled." },
+      { name: "author / time (message)", type: "string", def: "—", desc: "Meta line above the bubble." },
+    ],
+    slots: [
+      { name: "header", desc: "Title row above the transcript." },
+      { name: "(default)", desc: "ga-chat-message children." },
+      { name: "footer", desc: "The composer — ga-input + ga-button is the recipe." },
+    ],
+    notes: "Following is conditional: new content pins to the newest message only while you are already at the bottom. Scroll up and a jump-to-latest button appears — a real button in the shadow root, focusable and announced — which resumes following. A streaming turn mutates text without adding a node, which slotchange never sees, so the transcript watches the subtree too.",
+  },
+
 };
 
 /** Palette swatches for Foundations → Colors (token name → label). */
