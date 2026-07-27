@@ -190,6 +190,10 @@ function renderComponent(page) {
   );
   if (page.playground) frag.append(playground(page.playground));
   for (const ex of page.examples || []) frag.append(example(ex));
+  // Prose that an example can't carry: design rationale, a CSS recipe, the
+  // "reach for that element instead" guidance. Same `.prose` treatment the
+  // doc pages get; trusted, because it comes from our own registry.
+  if (page.notes) frag.append(el("div", { class: "prose", html: page.notes }));
 
   frag.append(table("Attributes", ["Name", "Type", "Default", "Description"], page.api,
     (r) => [`<code>${r.name}</code>`, `<code>${escapeHtml(r.type)}</code>`, `<code>${r.def}</code>`, r.desc]));

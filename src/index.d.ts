@@ -45,3 +45,8 @@ export { GaDateInput } from "./components/date-input/date-input.js";
 export { GaChartFrame } from "./components/chart-frame/chart-frame.js";
 export { GaChatMessage } from "./components/chat-message/chat-message.js";
 export { GaChat } from "./components/chat/chat.js";
+export { GaCheckbox } from "./components/checkbox/checkbox.js";
+export { GaFileButton } from "./components/file-button/file-button.js";
+export { GaQuantity } from "./components/quantity/quantity.js";
+export { GaMetric } from "./components/metric/metric.js";
+export { GaStatus } from "./components/status/status.js";
