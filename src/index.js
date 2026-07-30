@@ -43,6 +43,12 @@ import "./components/date-input/date-input.js";
 import "./components/chart-frame/chart-frame.js";
 import "./components/chat-message/chat-message.js";
 import "./components/chat/chat.js";
+import "./components/tooltip/tooltip.js";
+import "./components/step-list/step-list.js";
+import "./components/scrubber/scrubber.js";
+import "./components/comment/comment.js";
+import "./components/comment-thread/comment-thread.js";
+import "./components/splitter/splitter.js";
 
 /* index.d.ts declares a named export per component, so these have to exist at
    runtime too — otherwise `import { GaButton } from "@gaarutyunov/ui-kit"`
@@ -77,3 +83,9 @@ export { GaDateInput } from "./components/date-input/date-input.js";
 export { GaChartFrame } from "./components/chart-frame/chart-frame.js";
 export { GaChatMessage } from "./components/chat-message/chat-message.js";
 export { GaChat } from "./components/chat/chat.js";
+export { GaTooltip } from "./components/tooltip/tooltip.js";
+export { GaStepList } from "./components/step-list/step-list.js";
+export { GaScrubber } from "./components/scrubber/scrubber.js";
+export { GaComment } from "./components/comment/comment.js";
+export { GaCommentThread } from "./components/comment-thread/comment-thread.js";
+export { GaSplitter } from "./components/splitter/splitter.js";
