@@ -40,7 +40,8 @@ the same kit drops into any stack with no framework-specific adapter:
 `ga-file-drop` · `ga-file-button` · `ga-fab` · `ga-panel` · `ga-header` ·
 `ga-bottom-nav` · `ga-bottom-sheet` · `ga-icon` · `ga-select` ·
 `ga-combobox` · `ga-calendar` · `ga-date-input` · `ga-chart-frame` ·
-`ga-chat` · `ga-chat-message`
+`ga-chat` · `ga-chat-message` · `ga-tooltip` · `ga-step-list` ·
+`ga-scrubber` · `ga-comment` · `ga-comment-thread` · `ga-splitter`
 
 Newest additions — the control surface a full-bleed canvas app needs:
 
@@ -76,6 +77,24 @@ traps focus by default.
 
 Earlier in this line-up:
 
+- **`ga-tooltip`** — a styled label beside its trigger, on hover *and* on
+  keyboard focus. It is decoration, never a name: `aria-labelledby` /
+  `aria-describedby` are IDREFs and IDREFs do not cross a shadow root, so the
+  trigger still needs its own `aria-label` or `title`.
+- **`ga-step-list`** — a selectable `<ol>` of status-bearing steps with **two
+  independent cursors**: `current` (what is playing, `aria-current="step"`) and
+  `selected` (what the reader chose, `aria-pressed`). They render distinctly and
+  simultaneously.
+- **`ga-scrubber`** — a segmented media timeline. Reach for `ga-slider` for a
+  plain value; reach for this when the track needs coloured intervals, per-segment
+  activation and an independent playhead.
+- **`ga-comment` / `ga-comment-thread`** — a review thread: uniformly aligned
+  cards, a resolve/reopen state, and a composer above the list. Reach for
+  `ga-chat` for a conversation that arrives while you wait; this one is a list
+  rather than a live log and never follows the scroll.
+- **`ga-splitter`** — the draggable divider alone, not a split-pane container.
+  It writes its position to a CSS custom property and leaves the grid to the
+  app; for collapse-on-narrow, compose `ga-panel side="left"` with `ga-tabs`.
 - **`ga-radio-group`** — a single-select control in the segmented-pill style
   (config via `items` JSON + a reflected `value`; form-associated, arrow-key nav).
 - **`ga-code`** — a copyable code / command block (clipboard copy by default,
@@ -83,6 +102,12 @@ Earlier in this line-up:
 - **`ga-breadcrumbs`** — a monospace breadcrumb trail (config via `items` JSON).
 - **`ga-table`** — a data table with a shared column grid and slotted light-DOM
   rows, so a whole row can be an `<a href>` and cells stay rich.
+
+> **Breaking:** `ga-chat-message`'s speaker attribute was `role` in **v0.3.0**
+> and is now **`from`**. The values are unchanged (`user | assistant | system`)
+> and so is everything it renders — only the spelling moved, because `role` is
+> the global ARIA attribute and the vocabulary would eventually collide with a
+> real role token.
 
 Cards and pills follow the
 [garutyunov.com](https://github.com/gaarutyunov/garutyunov.com) styling; the

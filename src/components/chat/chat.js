@@ -6,8 +6,8 @@ import { GaElement, define, esc } from "../../core/base-element.js";
  *
  *   <ga-chat empty-text="Ask the coach anything.">
  *     <span slot="header">Coach</span>
- *     <ga-chat-message role="user">Log 3x5 at 100kg</ga-chat-message>
- *     <ga-chat-message role="assistant">Logged.</ga-chat-message>
+ *     <ga-chat-message from="user">Log 3x5 at 100kg</ga-chat-message>
+ *     <ga-chat-message from="assistant">Logged.</ga-chat-message>
  *     <form slot="footer">…</form>
  *   </ga-chat>
  *
@@ -18,6 +18,11 @@ import { GaElement, define, esc } from "../../core/base-element.js";
  * appears saying newer messages are waiting, and activating it resumes
  * following. That button is a real `<button>` in the shadow root — focusable,
  * keyboard-activated and announced — not a decorative overlay.
+ *
+ * **When not to reach for this.** A chat is a conversation between two parties,
+ * which is why messages align by speaker and the transcript follows the newest
+ * one. A code-review thread is neither: use `<ga-comment-thread>`, which is a
+ * list rather than a live log and deliberately leaves the scroll alone.
  *
  * Attributes: empty-text, height (CSS length for the transcript).
  * Slots: `header`, (default) — the messages, `footer` — the composer.

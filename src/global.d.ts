@@ -45,6 +45,12 @@ import type { GaQuantity } from "./components/quantity/quantity.js";
 import type { GaMetric } from "./components/metric/metric.js";
 import type { GaStatus } from "./components/status/status.js";
 import type { GaCombobox } from "./components/combobox/combobox.js";
+import type { GaTooltip } from "./components/tooltip/tooltip.js";
+import type { GaStepList } from "./components/step-list/step-list.js";
+import type { GaScrubber } from "./components/scrubber/scrubber.js";
+import type { GaComment } from "./components/comment/comment.js";
+import type { GaCommentThread } from "./components/comment-thread/comment-thread.js";
+import type { GaSplitter } from "./components/splitter/splitter.js";
 
 declare global {
   interface HTMLElementTagNameMap {
@@ -83,6 +89,12 @@ declare global {
     "ga-metric": GaMetric;
     "ga-status": GaStatus;
     "ga-combobox": GaCombobox;
+    "ga-tooltip": GaTooltip;
+    "ga-step-list": GaStepList;
+    "ga-scrubber": GaScrubber;
+    "ga-comment": GaComment;
+    "ga-comment-thread": GaCommentThread;
+    "ga-splitter": GaSplitter;
   }
 }
 
