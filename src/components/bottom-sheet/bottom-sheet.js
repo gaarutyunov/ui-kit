@@ -1,22 +1,52 @@
 import { GaElement, define } from "../../core/base-element.js";
+import { syncFocusTrap } from "../../core/focus-trap.js";
 
 /**
  * `<ga-bottom-sheet>` — a draggable sheet that rises from the bottom of the
  * screen with snap points, à la Google Maps.
  *
  * Drag the grab handle (or the header) between three detents — `peek`, `half`,
- * `full` — and drag below `peek` to dismiss. Persistent (no backdrop).
+ * `full` — and drag below `peek` to dismiss. Escape dismisses it too, because
+ * a gesture is not an affordance for anyone driving the page from a keyboard.
+ *
+ * ## The mobile half of the overlay pair
+ *
+ * This is the narrow-viewport form of `<ga-panel overlay>`: same content, same
+ * `--ga-z-overlay` stacking token under `overlay`, but anchored to the bottom
+ * edge where a thumb can reach it. The viewport width at which an app should
+ * swap one for the other is **{@link GaBottomSheet.breakpoint} (640px)** —
+ * stated here rather than left to each app to invent. The full composition
+ * recipe for a canvas app lives in `<ga-panel>`'s documentation.
+ *
+ * ## Focus containment
+ *
+ * The sheet **traps focus by default**, and this is the deliberate opposite of
+ * `<ga-panel overlay>`. A sheet at `half` or `full` covers the content beneath
+ * it, so letting Tab wander behind it would let the keyboard drive a UI the
+ * user cannot see. A panel is a persistent control surface and must not hold
+ * the keyboard; a sheet is modal and must. Set `trap-focus="false"` for the
+ * persistent, Maps-style sheet that only ever sits at `peek`.
  *
  * Attributes:
- *   open   boolean — reflected; whether the sheet is visible
- *   snap   "peek" | "half" | "full"  (reflected; default "half")
+ *   open        boolean — reflected; whether the sheet is visible
+ *   snap        "peek" | "half" | "full"  (reflected; default "half")
+ *   overlay     boolean — paint at `--ga-z-overlay` with a blurred backdrop,
+ *               for sheets floating over an app's own full-bleed canvas
+ *   trap-focus  "false" opts out of the default focus containment
  *
  * Slots: `header` (sits under the handle), default (scrollable body).
  * Methods: show(snap?) / close() / snapTo(snap).
  * Events: `open`, `close`, `snapchange` ({ snap }).
  */
 export class GaBottomSheet extends GaElement {
-  static observed = ["open", "snap"];
+  static observed = ["open", "snap", "overlay", "trap-focus"];
+
+  /**
+   * The documented breakpoint at which an overlay panel becomes a sheet, in
+   * CSS pixels. Exposed as a static so an app's `matchMedia` query and the
+   * kit's documentation cannot drift apart.
+   */
+  static breakpoint = 640;
 
   static styles = /* css */ `
     :host { display: contents; }
@@ -43,6 +73,21 @@ export class GaBottomSheet extends GaElement {
     .head:empty { display: none; }
 
     .body { flex: 1; overflow-y: auto; padding: 0 20px 24px; color: var(--ga-muted, #878787); line-height: 1.55; }
+
+    /* ---- Overlay mode ---------------------------------------------------
+       Gated on [overlay] and appended last, so a sheet without the attribute
+       matches exactly the rules it always did. Same treatment as an overlay
+       panel: the app's canvas cannot paint over it, and the backdrop blur
+       keeps the sheet legible against whatever is moving underneath. */
+    :host([overlay]) .sheet { z-index: var(--ga-z-overlay, 900); }
+
+    @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+      :host([overlay]) .sheet {
+        background: color-mix(in srgb, var(--ga-bg, #000) 82%, transparent);
+        -webkit-backdrop-filter: blur(14px);
+        backdrop-filter: blur(14px);
+      }
+    }
   `;
 
   template() {
@@ -63,12 +108,18 @@ export class GaBottomSheet extends GaElement {
     this._onUp = () => this._up();
     window.addEventListener("pointermove", this._onMove);
     window.addEventListener("pointerup", this._onUp);
+    // Dragging down dismisses the sheet; Escape is the same exit for anyone
+    // who has no pointer to drag with.
+    this._onKey = (e) => { if (e.key === "Escape" && this.open) this.close(); };
+    document.addEventListener("keydown", this._onKey);
   }
 
   disconnectedCallback() {
     window.removeEventListener("resize", this._onResize);
     window.removeEventListener("pointermove", this._onMove);
     window.removeEventListener("pointerup", this._onUp);
+    document.removeEventListener("keydown", this._onKey);
+    syncFocusTrap(this, false);
   }
 
   // Reposition on attribute changes instead of re-rendering the DOM.
@@ -87,6 +138,15 @@ export class GaBottomSheet extends GaElement {
 
   get open() { return this.hasFlag("open"); }
   get snap() { return this.attr("snap", "half"); }
+  get overlay() { return this.hasFlag("overlay"); }
+
+  /**
+   * On unless opted out — the mirror image of `<ga-panel>`'s getter, and the
+   * difference between the two is exactly this line. The sheet covers what is
+   * beneath it, so the app does not have to ask for containment; a panel is
+   * persistent, so it must.
+   */
+  get trapFocus() { return this.attr("trap-focus", "true") !== "false"; }
 
   show(snap) { if (snap) this.setAttribute("snap", snap); this.setAttribute("open", ""); this._apply(); this.emit("open"); }
   close() { this.removeAttribute("open"); this._apply(); this.emit("close"); }
@@ -109,6 +169,10 @@ export class GaBottomSheet extends GaElement {
     const s = this._snaps();
     const y = this.open ? (s[this.snap] ?? s.half) : s.closed;
     sheet.style.transform = `translateY(${y}px)`;
+    // Every state change routes through here — show(), close(), a dismissing
+    // drag, an attribute flip — so this is the one place the trap has to
+    // follow the sheet's openness from.
+    syncFocusTrap(this, this.trapFocus && this.open);
   }
 
   _down(e) {

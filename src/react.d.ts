@@ -32,7 +32,8 @@ type Numish = string | number;
 
 interface GaButtonAttrs extends GaAttrs {
   variant?: "primary" | "secondary" | "ghost" | "danger";
-  size?: "sm" | "md" | "lg";
+  /** `"icon"` is a square, glyph-only button — it requires `aria-label` or `title`. */
+  size?: "sm" | "md" | "lg" | "icon";
   href?: string;
   download?: string | Bool;
   target?: string;
@@ -99,6 +100,7 @@ interface GaInputAttrs extends GaAttrs {
   error?: string;
   required?: Bool;
   disabled?: Bool;
+  readonly?: Bool;
 }
 
 interface GaSwitchAttrs extends GaAttrs {
@@ -136,6 +138,9 @@ interface GaSliderAttrs extends GaAttrs {
   step?: Numish;
   value?: Numish;
   label?: string;
+  "label-start"?: string;
+  "label-end"?: string;
+  "hide-value"?: Bool;
   disabled?: Bool;
 }
 
@@ -155,6 +160,10 @@ interface GaPanelAttrs extends GaAttrs {
   open?: Bool;
   side?: "right" | "left";
   title?: string;
+  /** Float above page content at `--ga-z-overlay` instead of acting as a drawer. */
+  overlay?: Bool;
+  /** Confine Tab to the panel while open. OFF by default. */
+  "trap-focus"?: Bool;
 }
 
 interface GaHeaderAttrs extends GaAttrs {
@@ -173,6 +182,10 @@ interface GaBottomNavAttrs extends GaAttrs {
 interface GaBottomSheetAttrs extends GaAttrs {
   open?: Bool;
   snap?: "peek" | "half" | "full";
+  /** Paint at `--ga-z-overlay` with a blurred backdrop, over an app's own canvas. */
+  overlay?: Bool;
+  /** The sheet is modal and traps focus by default; `"false"` opts out. */
+  "trap-focus"?: "false" | "true";
 }
 
 interface GaKbdAttrs extends GaAttrs {}
@@ -183,10 +196,14 @@ interface GaIconAttrs extends GaAttrs {
 }
 
 interface GaSelectAttrs extends GaAttrs {
-  /** JSON: `{ value, label, disabled? }[]`. Falls back to slotted `<option>`s. */
+  /** JSON: `{ value, label, disabled? }[]`; falls back to slotted `<option>` children. */
   options?: string;
-  /** Selected value; comma-separated when `multiple`. */
+  /**
+   * Selected value; comma-joined when `multiple`. The join is lossy, so a value
+   * that itself contains a comma must be set through the `.value` property.
+   */
   value?: string;
+  /** Toggle rows without closing; the trigger summarises as "N selected". */
   multiple?: Bool;
   /** Show a filter field in the popup. */
   filterable?: Bool;
@@ -200,45 +217,48 @@ interface GaSelectAttrs extends GaAttrs {
 }
 
 interface GaCalendarAttrs extends GaAttrs {
-  /** Selected date as `YYYY-MM-DD` — never a `Date`. */
+  /** Selected date, as `YYYY-MM-DD`. */
   value?: string;
-  /** The month on display, as `YYYY-MM`. */
+  /** The month on display, as `YYYY-MM`; defaults to `value`'s month. */
   month?: string;
+  /** Passed to `Intl` for month and weekday names. */
   locale?: string;
-  /** 0 = Sunday … 6 = Saturday. Default 1 (Monday). */
+  /** `0` = Sunday … `6` = Saturday. Default `1` (Monday). */
   "first-day"?: Numish;
-  /** `YYYY-MM-DD`. */
+  /** Selectable range, as `YYYY-MM-DD`; days outside it are disabled. */
   min?: string;
-  /** `YYYY-MM-DD`. */
   max?: string;
   disabled?: Bool;
 }
 
 interface GaDateInputAttrs extends GaAttrs {
-  /** `YYYY-MM-DD` — and what the form submits. */
+  /** The date, and what the form submits: always `YYYY-MM-DD`. */
   value?: string;
   label?: string;
+  /** Defaults to the locale's own numeric pattern. */
   placeholder?: string;
   hint?: string;
   error?: string;
   name?: string;
+  /** Passed through to the calendar. */
   locale?: string;
-  /** `YYYY-MM-DD`. */
+  /** Accepted range, as `YYYY-MM-DD`; outside it the field errors and keeps the old value. */
   min?: string;
-  /** `YYYY-MM-DD`. */
   max?: string;
-  /** 0 = Sunday … 6 = Saturday. Passed through to the calendar. */
+  /** Passed through to the calendar. `0` = Sunday … `6` = Saturday. */
   "first-day"?: Numish;
   disabled?: Bool;
   required?: Bool;
 }
 
 interface GaChartFrameAttrs extends GaAttrs {
+  /** Caption above the plot. */
   title?: string;
-  /** JSON: `{ label, color? }[]`. Swatches take `--ga-chart-1…8` in order. */
+  /** JSON: `{ label, color? }[]`; swatches take `--ga-chart-1…8` in series order. */
   legend?: string;
-  /** CSS length — minimum plot height. */
+  /** CSS length — the minimum plot height. Default `180px`. */
   height?: string;
+  /** Message for the empty state. Default `"No data"`. */
   "empty-text"?: string;
   loading?: Bool;
   empty?: Bool;
@@ -252,15 +272,76 @@ interface GaChatMessageAttrs extends GaAttrs {
    * with the global ARIA `role`. The values are unchanged; only the name moved.
    */
   from?: "user" | "assistant" | "system";
+  /** Whether the turn is settled. Default `"sent"`. */
   state?: "sent" | "pending" | "streaming" | "error";
   author?: string;
   time?: string;
 }
 
 interface GaChatAttrs extends GaAttrs {
-  "empty-text"?: string;
-  /** CSS length for the scrolling transcript. */
+  /** CSS length for the scrolling transcript. Default `360px`. */
   height?: string;
+  /** Shown when there are no messages. */
+  "empty-text"?: string;
+}
+
+interface GaCheckboxAttrs extends GaAttrs {
+  checked?: Bool;
+  /** The "select all" state over a partial selection; wins over `checked` visually. */
+  indeterminate?: Bool;
+  disabled?: Bool;
+  label?: string;
+  name?: string;
+  /** Submitted when checked; defaults to `"on"` as in the native control. */
+  value?: string;
+}
+
+interface GaFileButtonAttrs extends GaAttrs {
+  accept?: string;
+  multiple?: Bool;
+  label?: string;
+}
+
+interface GaQuantityAttrs extends GaAttrs {
+  value?: Numish;
+  unit?: string;
+  placeholder?: string;
+}
+
+interface GaMetricAttrs extends GaAttrs {
+  label?: string;
+  value?: Numish;
+  unit?: string;
+  placeholder?: string;
+  tone?: "neutral" | "accent" | "ok" | "warn" | "error";
+  /** The lead readout: a larger scale, still aligned with its neighbours. */
+  primary?: Bool;
+}
+
+interface GaStatusAttrs extends GaAttrs {
+  tone?: "neutral" | "ok" | "error";
+  /** Convenience for setting the message without touching light DOM. */
+  text?: string;
+}
+
+interface GaComboboxAttrs extends GaAttrs {
+  /** JSON `{ value, label, description?, disabled? }[]` — supplied by the host, never filtered locally. */
+  options?: string;
+  /** The committed value: a chosen suggestion's `value`, or the typed text. */
+  value?: string;
+  label?: string;
+  placeholder?: string;
+  hint?: string;
+  error?: string;
+  name?: string;
+  /** Milliseconds of quiet before `filter` fires. Default `200`. */
+  debounce?: Numish;
+  "no-results-text"?: string;
+  "loading-text"?: string;
+  /** Set while fetching, so the list says "Searching…" instead of "No results". */
+  loading?: Bool;
+  disabled?: Bool;
+  required?: Bool;
 }
 
 interface GaTooltipAttrs extends GaAttrs {
@@ -377,6 +458,12 @@ declare module "react" {
       "ga-chart-frame": GaChartFrameAttrs;
       "ga-chat-message": GaChatMessageAttrs;
       "ga-chat": GaChatAttrs;
+      "ga-checkbox": GaCheckboxAttrs;
+      "ga-file-button": GaFileButtonAttrs;
+      "ga-quantity": GaQuantityAttrs;
+      "ga-metric": GaMetricAttrs;
+      "ga-status": GaStatusAttrs;
+      "ga-combobox": GaComboboxAttrs;
       "ga-tooltip": GaTooltipAttrs;
       "ga-step-list": GaStepListAttrs;
       "ga-scrubber": GaScrubberAttrs;
