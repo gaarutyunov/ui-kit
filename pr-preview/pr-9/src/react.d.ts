@@ -265,8 +265,13 @@ interface GaChartFrameAttrs extends GaAttrs {
 }
 
 interface GaChatMessageAttrs extends GaAttrs {
-  /** Alignment and treatment of the turn. Default `"assistant"`. */
-  role?: "user" | "assistant" | "system";
+  /**
+   * Speaker — picks the alignment and treatment.
+   *
+   * BREAKING since v0.3.0: this attribute was spelled `role`, which collided
+   * with the global ARIA `role`. The values are unchanged; only the name moved.
+   */
+  from?: "user" | "assistant" | "system";
   /** Whether the turn is settled. Default `"sent"`. */
   state?: "sent" | "pending" | "streaming" | "error";
   author?: string;
@@ -339,6 +344,88 @@ interface GaComboboxAttrs extends GaAttrs {
   required?: Bool;
 }
 
+interface GaTooltipAttrs extends GaAttrs {
+  /** The label. Omit it to adopt the trigger's `title`. */
+  text?: string;
+  /** Preferred side; flips to the opposite one when there is no room. */
+  placement?: "top" | "bottom" | "left" | "right";
+  /** Hover show delay in ms (default 300). Focus is never delayed. */
+  delay?: Numish;
+}
+
+interface GaStepListAttrs extends GaAttrs {
+  /** JSON: `{ id, label, meta?, status?, badge? }[]`. */
+  steps?: string;
+  /** Id of the step that is playing (`aria-current="step"`). */
+  current?: string;
+  /** Id of the step the reader chose (`aria-pressed`, reflected). */
+  selected?: string;
+  /** Accessible name for the list (default "Steps"). */
+  label?: string;
+}
+
+interface GaScrubberAttrs extends GaAttrs {
+  /** Total length in ms; defaults to the end of the last segment. */
+  duration?: Numish;
+  /** Playhead, in ms. */
+  position?: Numish;
+  /** JSON: `{ id?, start, duration, status?, label? }[]` — all times in ms. */
+  segments?: string;
+  /** Ms per arrow key (default: 1% of the duration). */
+  step?: Numish;
+  /** Accessible name (default "Timeline"). */
+  label?: string;
+  disabled?: Bool;
+}
+
+interface GaCommentAttrs extends GaAttrs {
+  author?: string;
+  /** Human-readable timestamp, e.g. "2h ago". */
+  time?: string;
+  /** Machine-readable timestamp; defaults to `time`. */
+  datetime?: string;
+  /** What the comment is attached to. */
+  anchor?: string;
+  resolved?: Bool;
+  /** Hide the resolve toggle — for a reply rather than a thread head. */
+  "no-resolve"?: Bool;
+}
+
+interface GaCommentThreadAttrs extends GaAttrs {
+  /** What a new comment will attach to (drives the composer's target line). */
+  anchor?: string;
+  /** Accessible name for the list (default "Comments"). */
+  label?: string;
+  "empty-text"?: string;
+  placeholder?: string;
+  /** Composer button text (default "Comment"). */
+  "submit-label"?: string;
+  /** A message from the host, shown under the composer. */
+  error?: string;
+  /** A submission is in flight; the composer locks. */
+  busy?: Bool;
+  /** CSS length; when set, the list scrolls inside it. */
+  height?: string;
+}
+
+interface GaSplitterAttrs extends GaAttrs {
+  /** Current position (default 50). */
+  value?: Numish;
+  min?: Numish;
+  max?: Numish;
+  /** Arrow-key increment (default 1); Page keys move 10 steps. */
+  step?: Numish;
+  /** CSS unit written with the value (default `%`; `px` also works). */
+  unit?: string;
+  orientation?: "vertical" | "horizontal";
+  /** Custom property to write (default `--ga-split`). */
+  property?: string;
+  /** Where to write it. */
+  scope?: "parent" | "root";
+  /** Accessible name (default "Resize panels"). */
+  label?: string;
+}
+
 declare module "react" {
   namespace JSX {
     interface IntrinsicElements {
@@ -377,6 +464,12 @@ declare module "react" {
       "ga-metric": GaMetricAttrs;
       "ga-status": GaStatusAttrs;
       "ga-combobox": GaComboboxAttrs;
+      "ga-tooltip": GaTooltipAttrs;
+      "ga-step-list": GaStepListAttrs;
+      "ga-scrubber": GaScrubberAttrs;
+      "ga-comment": GaCommentAttrs;
+      "ga-comment-thread": GaCommentThreadAttrs;
+      "ga-splitter": GaSplitterAttrs;
     }
   }
 }
