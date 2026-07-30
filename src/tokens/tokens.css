@@ -84,6 +84,14 @@
   --ga-transition: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
   --ga-transition-slow: 0.32s cubic-bezier(0.4, 0, 0.2, 1);
 
+  /* ---- Stacking ---------------------------------------------------------
+     The level an overlay paints at is a token, not an internal constant, so an
+     app that composites its own full-bleed layer — a map, a WebGL scene — can
+     position around the kit instead of guessing a z-index and losing the race.
+     Used by `<ga-panel overlay>` and `<ga-bottom-sheet overlay>`.           */
+  --ga-z-canvas: 0;    /* the app's own full-bleed content, underneath      */
+  --ga-z-overlay: 900; /* a floating panel or sheet above it                */
+
   /* ---- Focus ring ------------------------------------------------------- */
   --ga-ring: 0 0 0 2px var(--ga-bg), 0 0 0 4px var(--ga-accent);
 

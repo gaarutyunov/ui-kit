@@ -34,15 +34,48 @@ the same kit drops into any stack with no framework-specific adapter:
 ## Components
 
 `ga-button` · `ga-radio-group` · `ga-badge` · `ga-card` · `ga-avatar` ·
-`ga-input` · `ga-switch` · `ga-spinner` · `ga-alert` · `ga-kbd` · `ga-code` ·
-`ga-tabs` · `ga-breadcrumbs` · `ga-table` · `ga-note` · `ga-slider` ·
-`ga-file-drop` · `ga-fab` · `ga-panel` · `ga-header` · `ga-bottom-nav` ·
-`ga-bottom-sheet` · `ga-icon` · `ga-select` · `ga-calendar` ·
-`ga-date-input` · `ga-chart-frame` · `ga-chat` · `ga-chat-message` ·
-`ga-tooltip` · `ga-step-list` · `ga-scrubber` · `ga-comment` ·
-`ga-comment-thread` · `ga-splitter`
+`ga-input` · `ga-switch` · `ga-checkbox` · `ga-spinner` · `ga-alert` ·
+`ga-kbd` · `ga-code` · `ga-tabs` · `ga-breadcrumbs` · `ga-table` ·
+`ga-quantity` · `ga-metric` · `ga-note` · `ga-status` · `ga-slider` ·
+`ga-file-drop` · `ga-file-button` · `ga-fab` · `ga-panel` · `ga-header` ·
+`ga-bottom-nav` · `ga-bottom-sheet` · `ga-icon` · `ga-select` ·
+`ga-combobox` · `ga-calendar` · `ga-date-input` · `ga-chart-frame` ·
+`ga-chat` · `ga-chat-message` · `ga-tooltip` · `ga-step-list` ·
+`ga-scrubber` · `ga-comment` · `ga-comment-thread` · `ga-splitter`
 
-New in this line-up:
+Newest additions — the control surface a full-bleed canvas app needs:
+
+- **`ga-checkbox`** — a single boolean choice you *fill in* (as opposed to
+  `ga-switch`'s immediate on/off command). Form-associated and tri-state:
+  `indeterminate` is the "select all" state, and activating a mixed box
+  resolves it to checked, as the native control does.
+- **`ga-file-button`** — a compact control that opens the file dialog, for the
+  places a dashed drop area doesn't fit. Emits the same `files` event as
+  `ga-file-drop`, so a host can swap one for the other.
+- **`ga-quantity`** — a number with its unit (`24.5 km/h`), flowing inline so it
+  works in a sentence or a table cell. One measured value — not a statistic.
+- **`ga-metric`** — a labelled quantity, built *from* `ga-quantity`. Shared
+  baselines so a group lines up without per-app CSS, and a placeholder that
+  holds the tile's footprint until the first value arrives. There is
+  deliberately no row container: the docs page carries the CSS grid recipe.
+- **`ga-status`** — a single-line, tone-coloured status message with
+  `role="status"`, so a change is announced. A line, where `ga-alert` is a box.
+- **`ga-combobox`** — a text field with an asynchronous suggestion list, built
+  on `ga-select`'s popup and listbox rather than repeating them. The host owns
+  matching: answer the debounced `filter` event by replacing `options`, and
+  hold `loading` across the round trip. `ga-select` when the answer must come
+  from a known set; `ga-combobox` when the set is too large to ship, comes from
+  a server, or the user may type something that is not in it at all.
+
+Widened in the same pass, all additively — an existing usage renders exactly as
+before: `ga-button` gains `size="icon"` (and warns when an icon button has no
+accessible name), `ga-slider` gains `label-start` / `label-end` / `hide-value`,
+`ga-input` gains `prefix` / `suffix` adornments inside the field frame plus
+`readonly`, and `ga-panel` gains an `overlay` mode with opt-in `trap-focus` —
+whose narrow-viewport counterpart is `ga-bottom-sheet`, which is modal and so
+traps focus by default.
+
+Earlier in this line-up:
 
 - **`ga-tooltip`** — a styled label beside its trigger, on hover *and* on
   keyboard focus. It is decoration, never a name: `aria-labelledby` /

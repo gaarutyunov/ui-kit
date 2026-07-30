@@ -3,9 +3,16 @@ import { GaElement, define, esc } from "../../core/base-element.js";
 /**
  * `<ga-button>` — the kit's primary action element.
  *
+ * `size="icon"` is a size rather than a separate `<ga-icon-button>` element so
+ * every visual variant keeps applying to a glyph-only button, and a button that
+ * later gains a label does not have to change element. Because the glyph alone
+ * carries no accessible name, an icon button without `aria-label` or `title`
+ * warns in the console — the omission is silent in the browser and is the most
+ * common accessibility defect in exactly this shape.
+ *
  * Attributes:
  *   variant     "primary" | "secondary" | "ghost" | "danger"  (default secondary)
- *   size        "sm" | "md" | "lg"                              (default md)
+ *   size        "sm" | "md" | "lg" | "icon"                     (default md)
  *   href        render as a link instead of a button
  *   download    (link) filename hint / force-download           — forwarded to <a>
  *   target      (link) "_blank" | "_self" | …                   — forwarded to <a>
@@ -13,6 +20,7 @@ import { GaElement, define, esc } from "../../core/base-element.js";
  *   type        (button) "button" | "submit" | "reset"          — forwarded to <button>
  *   name        (button) form control name                      — forwarded to <button>
  *   aria-label  accessible label                                — forwarded to <a>/<button>
+ *   title       (icon size only) tooltip + accessible name      — forwarded to <a>/<button>
  *   disabled    boolean
  *   loading     boolean — shows a spinner and blocks clicks
  *   block       boolean — full width
@@ -22,7 +30,7 @@ import { GaElement, define, esc } from "../../core/base-element.js";
 export class GaButton extends GaElement {
   static observed = [
     "variant", "size", "href", "download", "target", "rel",
-    "type", "name", "aria-label", "disabled", "loading", "block",
+    "type", "name", "aria-label", "title", "disabled", "loading", "block",
   ];
 
   static styles = /* css */ `
@@ -66,6 +74,17 @@ export class GaButton extends GaElement {
     :host([size="sm"]) .btn { font-size: var(--ga-fs-sm, 14px); padding: 6px 12px; height: 32px; }
     .btn { font-size: var(--ga-fs-sm, 14px); padding: 8px 16px; height: 40px; }
     :host([size="lg"]) .btn { font-size: var(--ga-fs-base, 17px); padding: 12px 22px; height: 48px; }
+
+    /* Icon size: the md footprint made square, with the text padding removed so
+       the glyph sits dead centre. It is only a size, so every variant, the
+       loading spinner and the start/end slots keep working unchanged. */
+    :host([size="icon"]) .btn {
+      width: var(--ga-space-10, 40px);
+      height: var(--ga-space-10, 40px);
+      padding: 0;
+      gap: 0;
+    }
+    :host([size="icon"][block]) .btn { width: 100%; }
 
     /* variants */
     :host([variant="primary"]) .btn {
@@ -112,6 +131,12 @@ export class GaButton extends GaElement {
   connectedCallback() {
     super.connectedCallback();
     this.addEventListener("click", this._guard, true);
+    // Checked on a microtask rather than inside render(): an icon button built
+    // imperatively is often connected a step before its label is applied, and
+    // render() runs again on every observed attribute, which would turn one
+    // mistake into a stream of identical warnings. `_namedChecked` keeps it to
+    // exactly one warning per element for the whole life of the page.
+    queueMicrotask(() => this._warnIfUnnamed());
   }
 
   disconnectedCallback() {
@@ -125,6 +150,24 @@ export class GaButton extends GaElement {
     }
   };
 
+  /**
+   * An icon button's glyph is decorative to assistive technology, so without
+   * `aria-label` or `title` the control has no accessible name at all. Warn the
+   * developer once — refusing to render would be worse than a button that is
+   * merely unlabelled.
+   */
+  _warnIfUnnamed() {
+    if (this._namedChecked || !this.isConnected) return;
+    if (this.attr("size") !== "icon") return;
+    this._namedChecked = true;
+    if (this.attr("aria-label").trim() || this.attr("title").trim()) return;
+    console.warn(
+      '[ga-button] size="icon" has no accessible name — add aria-label (or ' +
+        "title) so the button is not announced as an unlabelled button.",
+      this
+    );
+  }
+
   /** Forward `name` from the host as attribute `out` on the inner element. */
   _pass(name, out = name) {
     return this.hasAttribute(name)
@@ -135,8 +178,14 @@ export class GaButton extends GaElement {
   template() {
     const href = this.attr("href");
     const tag = href ? "a" : "button";
-    // aria-label is forwarded to whichever inner element we render.
-    const aria = this._pass("aria-label");
+    // aria-label is forwarded to whichever inner element we render. `title` is
+    // forwarded only for the icon size: the inner control is the one that takes
+    // focus, so a host-level title never becomes its accessible name — and
+    // forwarding it unconditionally would change what already-shipped buttons
+    // render.
+    const aria =
+      this._pass("aria-label") +
+      (this.attr("size") === "icon" ? this._pass("title") : "");
     const attrs = href
       ? `href="${esc(href)}"` +
         this._pass("download") +

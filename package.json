@@ -56,9 +56,11 @@
     "dev": "node scripts/serve.mjs",
     "build": "node scripts/build.mjs",
     "bundle": "node scripts/bundle.mjs",
-    "types": "node scripts/types.mjs"
+    "types": "node scripts/types.mjs",
+    "types:check": "tsc -p tsconfig.check.json"
   },
   "devDependencies": {
+    "@types/react": "^19.2.17",
     "typescript": "^5.7.3"
   }
 }
