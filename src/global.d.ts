@@ -39,6 +39,12 @@ import type { GaDateInput } from "./components/date-input/date-input.js";
 import type { GaChartFrame } from "./components/chart-frame/chart-frame.js";
 import type { GaChatMessage } from "./components/chat-message/chat-message.js";
 import type { GaChat } from "./components/chat/chat.js";
+import type { GaTooltip } from "./components/tooltip/tooltip.js";
+import type { GaStepList } from "./components/step-list/step-list.js";
+import type { GaScrubber } from "./components/scrubber/scrubber.js";
+import type { GaComment } from "./components/comment/comment.js";
+import type { GaCommentThread } from "./components/comment-thread/comment-thread.js";
+import type { GaSplitter } from "./components/splitter/splitter.js";
 
 declare global {
   interface HTMLElementTagNameMap {
@@ -71,6 +77,12 @@ declare global {
     "ga-chart-frame": GaChartFrame;
     "ga-chat-message": GaChatMessage;
     "ga-chat": GaChat;
+    "ga-tooltip": GaTooltip;
+    "ga-step-list": GaStepList;
+    "ga-scrubber": GaScrubber;
+    "ga-comment": GaComment;
+    "ga-comment-thread": GaCommentThread;
+    "ga-splitter": GaSplitter;
   }
 }
 

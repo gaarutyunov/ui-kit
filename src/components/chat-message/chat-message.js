@@ -3,27 +3,39 @@ import { GaElement, define, esc } from "../../core/base-element.js";
 /**
  * `<ga-chat-message>` — one turn in a transcript.
  *
- *   <ga-chat-message role="user" author="You" time="09:12">Log 3x5 at 100kg</ga-chat-message>
- *   <ga-chat-message role="assistant" state="streaming">Logged. That is…</ga-chat-message>
+ *   <ga-chat-message from="user" author="You" time="09:12">Log 3x5 at 100kg</ga-chat-message>
+ *   <ga-chat-message from="assistant" state="streaming">Logged. That is…</ga-chat-message>
  *
- * `role` picks the alignment and treatment; `state` says whether the turn is
+ * `from` picks the alignment and treatment; `state` says whether the turn is
  * settled. A streaming turn marks its body `aria-live="polite"` so a screen
  * reader hears the text as it arrives, and a pending one is announced once —
  * an assistant turn that silently grows is invisible to anyone not watching.
  *
+ * **BREAKING (since v0.3.0): the speaker attribute was `role`; it is now
+ * `from`.** The values are unchanged — `user | assistant | system` — and so is
+ * everything the component renders. Only the spelling of the attribute moved.
+ *
+ * The old name was the global ARIA `role` attribute, so every message host
+ * literally carried `role="user"` or `role="assistant"`. That was silently
+ * harmless only because neither is a real ARIA role token, so browsers dropped
+ * them. It stops being harmless the moment the vocabulary grows: `comment`,
+ * `note`, `status` and `log` *are* real roles, and a host would start claiming
+ * one by accident. Renaming now costs one find-and-replace; renaming after a
+ * speaker called `comment` exists costs a bug nobody can see.
+ *
  * Attributes:
- *   role (`user` | `assistant` | `system`), state (`sent` | `pending` |
+ *   from (`user` | `assistant` | `system`), state (`sent` | `pending` |
  *   `streaming` | `error`), author, time
  *
  * Slots: (default) — the message body.
  */
 export class GaChatMessage extends GaElement {
-  static observed = ["role", "state", "author", "time"];
+  static observed = ["from", "state", "author", "time"];
 
   static styles = /* css */ `
     :host { display: block; }
     .row { display: flex; flex-direction: column; gap: 4px; max-width: 100%; }
-    :host([role="user"]) .row { align-items: flex-end; }
+    :host([from="user"]) .row { align-items: flex-end; }
 
     .meta {
       display: flex;
@@ -44,13 +56,13 @@ export class GaChatMessage extends GaElement {
       padding: 10px 13px;
       overflow-wrap: anywhere;
     }
-    :host([role="user"]) .bubble {
+    :host([from="user"]) .bubble {
       background: var(--ga-fg, #ededed);
       border-color: var(--ga-fg, #ededed);
       color: var(--ga-bg, #000);
     }
-    :host([role="system"]) .row { align-items: center; }
-    :host([role="system"]) .bubble {
+    :host([from="system"]) .row { align-items: center; }
+    :host([from="system"]) .bubble {
       background: transparent;
       border: 0;
       color: var(--ga-muted, #878787);
@@ -99,7 +111,7 @@ export class GaChatMessage extends GaElement {
   `;
 
   template() {
-    const role = this.attr("role", "assistant");
+    const from = this.attr("from", "assistant");
     const state = this.attr("state", "sent");
     const author = this.attr("author");
     const time = this.attr("time");
@@ -108,7 +120,7 @@ export class GaChatMessage extends GaElement {
     // Described by, never labelled by: an aria-label on the bubble *replaces*
     // the message text as its accessible name, so a screen reader would read
     // "Coach" instead of what Coach said.
-    const status = statusFor(role, state, author);
+    const status = statusFor(from, state, author);
 
     const body =
       state === "pending"
@@ -122,8 +134,10 @@ export class GaChatMessage extends GaElement {
     // One role, resolved by precedence: a system notice stays a note even when
     // it failed, and only a non-system failure is an alert. Emitting both
     // attributes left the browser to pick, which is not a decision to delegate.
+    // This is the *real* ARIA role, on the bubble — which is exactly why the
+    // speaker had to stop being called `role` on the host.
     const aria =
-      role === "system" ? `role="note"` : state === "error" ? `role="alert"` : "";
+      from === "system" ? `role="note"` : state === "error" ? `role="alert"` : "";
 
     return /* html */ `
       <div class="row" part="row">
@@ -143,8 +157,8 @@ export class GaChatMessage extends GaElement {
 }
 
 /** Extra context for a turn that is not simply sent — appended, not substituted. */
-function statusFor(role, state, author) {
-  const who = author || { user: "You", assistant: "Assistant", system: "System" }[role] || role;
+function statusFor(from, state, author) {
+  const who = author || { user: "You", assistant: "Assistant", system: "System" }[from] || from;
   if (state === "pending") return `${who} is replying`;
   if (state === "error") return `${who}, failed to send`;
   return "";
